@@ -12,12 +12,16 @@ document.addEventListener('DOMContentLoaded', function() {
         window.location.href = 'login.html';
         return;
     }
-    
     if (!AuthUtils.hasAcceptedTerms()) {
         window.location.href = 'terms.html';
         return;
     }
-    
+    // Detect admin user
+    const userData = AuthUtils.getUserData();
+    const isAdmin = userData && (userData.role === 'admin' || userData.is_admin);
+    if (isAdmin) {
+        document.getElementById('admin-panel-section').style.display = 'block';
+    }
     // Initialize dashboard
     initializeDashboard();
     setupNavigation();
@@ -25,9 +29,57 @@ document.addEventListener('DOMContentLoaded', function() {
     loadUserProfile();
     loadDashboardData();
     setupProfileImageUpload();
-    
     // Check if returning from terms acceptance with property booking
     checkForPendingBooking();
+    // Admin panel event listeners
+    if (isAdmin) {
+        document.getElementById('loadAdminUsersBtn').onclick = loadAdminUsers;
+        document.getElementById('loadAdminHousesBtn').onclick = loadAdminHouses;
+        document.getElementById('loadAdminBookingsBtn').onclick = loadAdminBookings;
+    }
+    // Admin panel loaders
+    async function loadAdminUsers() {
+        const list = document.getElementById('adminUsersList');
+        list.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading users...';
+        try {
+            const response = await AuthUtils.apiRequest('/admin/users');
+            if (response.users && response.users.length) {
+                list.innerHTML = response.users.map(u => `<div><b>${u.name}</b> (${u.email}) - ${u.is_active ? 'Active' : 'Inactive'} <button onclick="alert('Not implemented')">Delete</button></div>`).join('');
+            } else {
+                list.innerHTML = 'No users found.';
+            }
+        } catch (e) {
+            list.innerHTML = 'Error loading users.';
+        }
+    }
+    async function loadAdminHouses() {
+        const list = document.getElementById('adminHousesList');
+        list.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading houses...';
+        try {
+            const response = await AuthUtils.apiRequest('/admin/houses');
+            if (response.houses && response.houses.length) {
+                list.innerHTML = response.houses.map(h => `<div><b>${h.name}</b> (${h.location}) - ${h.is_available ? 'Available' : 'Unavailable'} <button onclick="alert('Not implemented')">Delete</button></div>`).join('');
+            } else {
+                list.innerHTML = 'No houses found.';
+            }
+        } catch (e) {
+            list.innerHTML = 'Error loading houses.';
+        }
+    }
+    async function loadAdminBookings() {
+        const list = document.getElementById('adminBookingsList');
+        list.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading bookings...';
+        try {
+            const response = await AuthUtils.apiRequest('/admin/bookings');
+            if (response.bookings && response.bookings.length) {
+                list.innerHTML = response.bookings.map(b => `<div><b>${b.house.name}</b> - ${b.user.name} (${b.status}) <button onclick="alert('Approve/Reject not implemented')">Manage</button></div>`).join('');
+            } else {
+                list.innerHTML = 'No bookings found.';
+            }
+        } catch (e) {
+            list.innerHTML = 'Error loading bookings.';
+        }
+    }
     
     function checkForPendingBooking() {
         const urlParams = new URLSearchParams(window.location.search);

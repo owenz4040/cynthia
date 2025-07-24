@@ -66,6 +66,29 @@
     <!-- Main Content -->
     <main class="main-content">
         <!-- Dashboard Section -->
+        <section id="admin-panel-section" class="content-section" style="display:none;">
+            <div class="page-header">
+                <h1><i class="fas fa-user-shield"></i> Admin Panel</h1>
+                <p>Manage users, houses, and bookings</p>
+            </div>
+            <div class="admin-panel-grid">
+                <div class="admin-card">
+                    <h3><i class="fas fa-users"></i> Users</h3>
+                    <button id="loadAdminUsersBtn" class="btn-primary">Load Users</button>
+                    <div id="adminUsersList"></div>
+                </div>
+                <div class="admin-card">
+                    <h3><i class="fas fa-building"></i> Houses</h3>
+                    <button id="loadAdminHousesBtn" class="btn-primary">Load Houses</button>
+                    <div id="adminHousesList"></div>
+                </div>
+                <div class="admin-card">
+                    <h3><i class="fas fa-calendar-check"></i> Bookings</h3>
+                    <button id="loadAdminBookingsBtn" class="btn-primary">Load Bookings</button>
+                    <div id="adminBookingsList"></div>
+                </div>
+            </div>
+        </section>
         <section id="dashboard-section" class="content-section active">
             <div class="page-header">
                 <h1><i class="fas fa-th-large"></i> Dashboard</h1>
