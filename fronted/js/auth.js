@@ -161,7 +161,7 @@ class AuthUtils {
         const hasAcceptedTerms = this.hasAcceptedTerms();
         
         // Public pages that don't require authentication
-        const publicPages = ['login.html', 'register.html', 'admin.html', 'index.html', ''];
+        const publicPages = ['login.html', 'register.html', 'otp.html', 'admin.html', 'index.html', ''];
         
         if (!isAuthenticated && !publicPages.includes(currentPage)) {
             window.location.href = 'login.html';
