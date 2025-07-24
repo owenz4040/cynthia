@@ -671,9 +671,9 @@ function renderUsers(users) {
             <td>${user.age}</td>
             <td>${user.gender}</td>
             <td>
-                <span class="status-badge ${user.email_verified ? 'verified' : 'unverified'}">
-                    <i class="fas fa-${user.email_verified ? 'check-circle' : 'times-circle'}"></i>
-                    ${user.email_verified ? 'Verified' : 'Unverified'}
+                <span class="status-badge ${user.is_verified ? 'verified' : 'unverified'}">
+                    <i class="fas fa-${user.is_verified ? 'check-circle' : 'times-circle'}"></i>
+                    ${user.is_verified ? 'Verified' : 'Unverified'}
                 </span>
             </td>
             <td>
@@ -707,7 +707,7 @@ function renderUsers(users) {
 function updateUserStats(users) {
     const totalUsers = users.length;
     const activeUsers = users.filter(user => user.is_active !== false).length;
-    const verifiedUsers = users.filter(user => user.email_verified).length;
+    const verifiedUsers = users.filter(user => user.is_verified).length;
     
     document.getElementById('totalUsersCount').textContent = totalUsers;
     document.getElementById('activeUsersCount').textContent = activeUsers;

@@ -1,17 +1,14 @@
 // Registration page functionality
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize OTP container early so fallback can reference it
-    const otpContainer = document.querySelector('.otp-input-container');
-    setupOTPInputs(otpContainer);
+    // (Using single-field OTP input with id 'otpInput')
     // Fallback: Show OTP modal if registration was successful but not verified
     if (localStorage.getItem('pendingEmailVerification')) {
         currentEmail = localStorage.getItem('pendingEmailVerification');
         document.getElementById('userEmail').textContent = currentEmail;
         showModal('verificationModal');
-        const firstOtpInput = otpContainer.querySelector('.otp-input');
-        if (firstOtpInput) {
-            firstOtpInput.focus();
-        }
+        // Focus the single OTP input
+        const otpField = document.getElementById('otpInput');
+        if (otpField) otpField.focus();
     }
     const registerForm = document.getElementById('registerForm');
     const verificationModal = document.getElementById('verificationModal');
@@ -52,14 +49,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 localStorage.setItem('pendingEmailVerification', currentEmail);
                 // Update verification modal with user email
                 document.getElementById('userEmail').textContent = currentEmail;
-                // Show verification modal
-                closeModal('registerModal');
+                // Automatically show verification modal and focus OTP input
                 showModal('verificationModal');
-                // Focus first OTP input
-                const firstOtpInput = otpContainer.querySelector('.otp-input');
-                if (firstOtpInput) {
-                    firstOtpInput.focus();
-                }
+                const otpField = document.getElementById('otpInput');
+                if (otpField) otpField.focus();
+
                 // Success notification
                 showNotification(`🎉 Registration successful! Welcome ${currentUserName}! Please check your email (${currentEmail}) for the 6-digit verification code.`, 'success', 8000);
                 // Log successful registration for debugging
@@ -103,9 +97,9 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.removeItem('pendingEmailVerification');
         e.preventDefault();
         
-        const otpValue = getOTPValue(otpContainer);
+        const otpValue = document.getElementById('otpInput').value.trim();
         
-        if (otpValue.length !== 6) {
+        if (!otpValue || otpValue.length !== 6) {
             showNotification('Please enter the complete 6-digit verification code.', 'warning');
             return;
         }
@@ -115,10 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const response = await AuthUtils.apiRequest('/verify-email', {
                 method: 'POST',
-                body: JSON.stringify({
-                    email: currentEmail,
-                    otp: otpValue
-                })
+                body: JSON.stringify({ email: currentEmail, otp: otpValue })
             });
             
             // Close verification modal and show success modal

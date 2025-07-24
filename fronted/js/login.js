@@ -24,18 +24,13 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!validateLoginForm(data)) {
             return;
         }
-        
         showLoading('loginBtn', 'Signing in...');
-        
         try {
+            // Attempt login
             const response = await AuthUtils.apiRequest('/login', {
                 method: 'POST',
-                body: JSON.stringify({
-                    email: data.email,
-                    password: data.password
-                })
+                body: JSON.stringify({ email: data.email, password: data.password })
             });
-            
             // Store authentication data
             AuthUtils.setToken(response.token);
             AuthUtils.setUserData(response.user);
@@ -136,6 +131,7 @@ document.addEventListener('DOMContentLoaded', function() {
         showLoading(submitBtn.closest('button').id || 'quickVerifyBtn', 'Verifying...');
         
         try {
+            // Verify OTP
             await AuthUtils.apiRequest('/verify-email', {
                 method: 'POST',
                 body: JSON.stringify({
@@ -143,7 +139,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     otp: otpValue
                 })
             });
-            
             showNotification('Email verified successfully! Please login again.', 'success');
             closeModal('verificationRequiredModal');
             
