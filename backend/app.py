@@ -18,7 +18,11 @@ def create_app(config_name=None):
     
     # Initialize extensions
     mongo.init_app(app)
-    CORS(app, origins=app.config['CORS_ORIGINS'])
+    CORS(app, 
+         origins=app.config['CORS_ORIGINS'],
+         methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+         allow_headers=['Content-Type', 'Authorization', 'Access-Control-Allow-Credentials'],
+         supports_credentials=True)
     jwt = JWTManager(app)
     
     # Configure Cloudinary

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Connection Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        button {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            min-height: 44px;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            word-break: break-all;
+            font-size: 14px;
+        }
+        .success {
+            background: rgba(46, 204, 113, 0.3);
+            border: 1px solid rgba(46, 204, 113, 0.5);
+        }
+        .error {
+            background: rgba(231, 76, 60, 0.3);
+            border: 1px solid rgba(231, 76, 60, 0.5);
+        }
+        .info {
+            background: rgba(52, 152, 219, 0.3);
+            border: 1px solid rgba(52, 152, 219, 0.5);
+        }
+        .clear-btn {
+            background: rgba(231, 76, 60, 0.2);
+            border-color: rgba(231, 76, 60, 0.3);
+        }
+        .clear-btn:hover {
+            background: rgba(231, 76, 60, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 API Connection Test</h1>
+        
+        <div class="test-section">
+            <h3>Environment Detection</h3>
+            <button onclick="checkEnvironment()">Check Current Environment</button>
+            <div id="envResult" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Backend API Tests</h3>
+            <button onclick="testHealthEndpoint()">Test Health Endpoint</button>
+            <button onclick="testRootEndpoint()">Test Root Endpoint</button>
+            <button onclick="testApiEndpoint()">Test API Info Endpoint</button>
+            <div id="apiResult" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Network Information</h3>
+            <button onclick="getNetworkInfo()">Get Network Info</button>
+            <div id="networkResult" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>CORS Test</h3>
+            <button onclick="testCORS()">Test CORS Policy</button>
+            <div id="corsResult" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <button onclick="clearResults()" class="clear-btn">Clear All Results</button>
+            <button onclick="runAllTests()">🚀 Run All Tests</button>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script>
+        // Test functions
+        function checkEnvironment() {
+            const result = document.getElementById('envResult');
+            result.style.display = 'block';
+            result.className = 'result info';
+            
+            const hostname = window.location.hostname;
+            const port = window.location.port;
+            const protocol = window.location.protocol;
+            const apiBase = window.Config ? window.Config.API_BASE : 'Config not loaded';
+            
+            result.innerHTML = `
+                <strong>Environment Info:</strong><br>
+                Hostname: ${hostname}<br>
+                Port: ${port || 'default'}<br>
+                Protocol: ${protocol}<br>
+                API Base URL: ${apiBase}<br>
+                User Agent: ${navigator.userAgent}<br>
+                Screen: ${screen.width}x${screen.height}<br>
+                Connection: ${navigator.connection ? navigator.connection.effectiveType : 'unknown'}
+            `;
+        }
+
+        async function testHealthEndpoint() {
+            const result = document.getElementById('apiResult');
+            result.style.display = 'block';
+            result.className = 'result info';
+            result.innerHTML = '🔄 Testing health endpoint...';
+            
+            try {
+                const baseURL = window.Config ? window.Config.API_BASE.replace('/api', '') : 'https://cynthia-api.onrender.com';
+                const response = await fetch(`${baseURL}/health`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    mode: 'cors'
+                });
+                
+                const data = await response.json();
+                result.className = 'result success';
+                result.innerHTML = `
+                    <strong>✅ Health Check Success!</strong><br>
+                    Status: ${response.status}<br>
+                    Response: ${JSON.stringify(data, null, 2)}
+                `;
+            } catch (error) {
+                result.className = 'result error';
+                result.innerHTML = `
+                    <strong>❌ Health Check Failed!</strong><br>
+                    Error: ${error.message}<br>
+                    Type: ${error.name}<br>
+                    Stack: ${error.stack}
+                `;
+            }
+        }
+
+        async function testRootEndpoint() {
+            const result = document.getElementById('apiResult');
+            result.style.display = 'block';
+            result.className = 'result info';
+            result.innerHTML = '🔄 Testing root endpoint...';
+            
+            try {
+                const baseURL = window.Config ? window.Config.API_BASE.replace('/api', '') : 'https://cynthia-api.onrender.com';
+                const response = await fetch(`${baseURL}/`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    mode: 'cors'
+                });
+                
+                const data = await response.json();
+                result.className = 'result success';
+                result.innerHTML = `
+                    <strong>✅ Root Endpoint Success!</strong><br>
+                    Status: ${response.status}<br>
+                    Response: ${JSON.stringify(data, null, 2)}
+                `;
+            } catch (error) {
+                result.className = 'result error';
+                result.innerHTML = `
+                    <strong>❌ Root Endpoint Failed!</strong><br>
+                    Error: ${error.message}<br>
+                    Type: ${error.name}
+                `;
+            }
+        }
+
+        async function testApiEndpoint() {
+            const result = document.getElementById('apiResult');
+            result.style.display = 'block';
+            result.className = 'result info';
+            result.innerHTML = '🔄 Testing API info endpoint...';
+            
+            try {
+                const apiBase = window.Config ? window.Config.API_BASE : 'https://cynthia-api.onrender.com/api';
+                const response = await fetch(`${apiBase}/`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    mode: 'cors'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                result.className = 'result success';
+                result.innerHTML = `
+                    <strong>✅ API Info Success!</strong><br>
+                    Status: ${response.status}<br>
+                    Response: ${JSON.stringify(data, null, 2)}
+                `;
+            } catch (error) {
+                result.className = 'result error';
+                result.innerHTML = `
+                    <strong>❌ API Info Failed!</strong><br>
+                    Error: ${error.message}<br>
+                    Type: ${error.name}
+                `;
+            }
+        }
+
+        function getNetworkInfo() {
+            const result = document.getElementById('networkResult');
+            result.style.display = 'block';
+            result.className = 'result info';
+            
+            const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+            const online = navigator.onLine;
+            
+            result.innerHTML = `
+                <strong>Network Information:</strong><br>
+                Online: ${online}<br>
+                Connection Type: ${connection ? connection.effectiveType : 'unknown'}<br>
+                Downlink: ${connection ? connection.downlink : 'unknown'} Mbps<br>
+                RTT: ${connection ? connection.rtt : 'unknown'} ms<br>
+                Save Data: ${connection ? connection.saveData : 'unknown'}<br>
+                Timestamp: ${new Date().toISOString()}
+            `;
+        }
+
+        async function testCORS() {
+            const result = document.getElementById('corsResult');
+            result.style.display = 'block';
+            result.className = 'result info';
+            result.innerHTML = '🔄 Testing CORS policy...';
+            
+            try {
+                const apiBase = window.Config ? window.Config.API_BASE : 'https://cynthia-api.onrender.com/api';
+                
+                // Test preflight request
+                const response = await fetch(`${apiBase}/`, {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Origin': window.location.origin,
+                        'Access-Control-Request-Method': 'GET',
+                        'Access-Control-Request-Headers': 'Content-Type',
+                    },
+                    mode: 'cors'
+                });
+                
+                result.className = 'result success';
+                result.innerHTML = `
+                    <strong>✅ CORS Test Success!</strong><br>
+                    Status: ${response.status}<br>
+                    Headers: ${JSON.stringify(Object.fromEntries(response.headers.entries()), null, 2)}
+                `;
+            } catch (error) {
+                result.className = 'result error';
+                result.innerHTML = `
+                    <strong>❌ CORS Test Failed!</strong><br>
+                    Error: ${error.message}<br>
+                    This might indicate CORS policy issues
+                `;
+            }
+        }
+
+        function clearResults() {
+            ['envResult', 'apiResult', 'networkResult', 'corsResult'].forEach(id => {
+                const element = document.getElementById(id);
+                element.style.display = 'none';
+                element.innerHTML = '';
+            });
+        }
+
+        async function runAllTests() {
+            checkEnvironment();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            getNetworkInfo();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            await testHealthEndpoint();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            await testRootEndpoint();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            await testApiEndpoint();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            await testCORS();
+        }
+
+        // Auto-run environment check when page loads
+        window.addEventListener('load', function() {
+            setTimeout(checkEnvironment, 1000);
+        });
+    </script>
+</body>
+</html>

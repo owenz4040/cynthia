@@ -38,7 +38,7 @@ class Config:
     CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET')
     
     # CORS Configuration
-    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', 'http://localhost:3000').split(',')
+    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', 'http://localhost:3000,https://cynthia-frontend.onrender.com').split(',')
 
 class DevelopmentConfig(Config):
     """Development configuration."""
