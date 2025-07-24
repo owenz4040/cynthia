@@ -81,11 +81,11 @@ CLOUDINARY_API_SECRET=your-api-secret
 2. **Create New Web Service**
    - Click "New +" → "Web Service"
    - Connect your GitHub repository
-   - Select your `rental-house-system` repository
+   - Select your `cynthia` repository
 
 3. **Configure Backend Service**
    ```
-   Name: rental-system-api
+   Name: cynthia-api
    Runtime: Python 3
    Build Command: pip install -r backend/requirements.txt
    Start Command: cd backend && gunicorn --bind 0.0.0.0:$PORT app:app
@@ -97,7 +97,7 @@ CLOUDINARY_API_SECRET=your-api-secret
 5. **Deploy**
    - Click "Create Web Service"
    - Wait for deployment (usually 5-10 minutes)
-   - Note your backend URL: `https://rental-system-api.onrender.com`
+   - Note your backend URL: `https://cynthia-api.onrender.com`
 
 ## 🎨 Step 4: Deploy Frontend to Render
 
@@ -107,7 +107,7 @@ CLOUDINARY_API_SECRET=your-api-secret
 
 2. **Configure Frontend Service**
    ```
-   Name: rental-system-frontend
+   Name: cynthia-frontend
    Build Command: echo "No build required"
    Publish Directory: fronted
    ```
@@ -115,7 +115,7 @@ CLOUDINARY_API_SECRET=your-api-secret
 3. **Deploy Frontend**
    - Click "Create Static Site"
    - Wait for deployment
-   - Note your frontend URL: `https://rental-system-frontend.onrender.com`
+   - Note your frontend URL: `https://cynthia-frontend.onrender.com`
 
 ## 🔗 Step 5: Update API Configuration
 
@@ -124,8 +124,8 @@ CLOUDINARY_API_SECRET=your-api-secret
 
    ```javascript
    // Replace these with your actual Render URLs
-   return 'https://rental-system-api.onrender.com/api';     // Backend URL
-   return 'https://rental-system-frontend.onrender.com';   // Frontend URL
+   return 'https://cynthia-api.onrender.com/api';     // Backend URL
+   return 'https://cynthia-frontend.onrender.com';   // Frontend URL
    ```
 
 2. **Commit and Push Changes**

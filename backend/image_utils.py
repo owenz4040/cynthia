@@ -2,7 +2,6 @@ import os
 import cloudinary
 import cloudinary.uploader
 from werkzeug.utils import secure_filename
-from PIL import Image
 import io
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
@@ -23,29 +22,21 @@ def configure_cloudinary(app):
 def upload_image_to_cloudinary(file, folder="rental_houses"):
     """Upload image to Cloudinary and return URL and public_id."""
     try:
-        # Resize image if too large
-        image = Image.open(file)
+        # Reset file pointer to beginning
+        file.seek(0)
         
-        # Convert to RGB if necessary (for PNG with transparency)
-        if image.mode in ('RGBA', 'LA', 'P'):
-            image = image.convert('RGB')
-        
-        # Resize if image is too large (max 1920x1080)
-        max_size = (1920, 1080)
-        if image.size[0] > max_size[0] or image.size[1] > max_size[1]:
-            image.thumbnail(max_size, Image.Resampling.LANCZOS)
-        
-        # Save resized image to bytes
-        img_byte_arr = io.BytesIO()
-        image.save(img_byte_arr, format='JPEG', quality=85)
-        img_byte_arr.seek(0)
-        
-        # Upload to Cloudinary
+        # Upload to Cloudinary with transformation for optimization
         result = cloudinary.uploader.upload(
-            img_byte_arr,
+            file,
             folder=folder,
             resource_type="image",
-            format="jpg"
+            format="jpg",
+            quality="auto:good",
+            fetch_format="auto",
+            transformation=[
+                {"width": 1920, "height": 1080, "crop": "limit"},
+                {"quality": "auto:good"}
+            ]
         )
         
         return {
@@ -83,16 +74,9 @@ def save_image_locally(file, upload_folder):
         
         file_path = os.path.join(upload_folder, filename)
         
-        # Resize and save image
-        image = Image.open(file)
-        if image.mode in ('RGBA', 'LA', 'P'):
-            image = image.convert('RGB')
-        
-        max_size = (1920, 1080)
-        if image.size[0] > max_size[0] or image.size[1] > max_size[1]:
-            image.thumbnail(max_size, Image.Resampling.LANCZOS)
-        
-        image.save(file_path, 'JPEG', quality=85)
+        # Reset file pointer and save directly (no resizing without Pillow)
+        file.seek(0)
+        file.save(file_path)
         
         return filename
     
