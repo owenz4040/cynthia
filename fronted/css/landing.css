@@ -1796,7 +1796,6 @@
         border-radius: 0;
     }
     
-    .mobile-nav-menu .nav-link:last-child {
-        border-bottom: none;
-    }
+.mobile-nav-menu .nav-link:last-child {
+    border-bottom: none;
 }

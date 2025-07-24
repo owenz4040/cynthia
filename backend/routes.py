@@ -91,16 +91,15 @@ def register_user():
         # Generate and send OTP
         otp_code = OTPModel.create_otp(data['email'])
         email_sent = send_otp_email(data['email'], otp_code, data['name'])
-        
         if not email_sent:
             return jsonify({
-                'error': 'Failed to send verification email. Please try again.'
+                'error': 'Failed to send verification email. Please check your email address and try again. If the problem persists, contact support.'
             }), 500
-        
         return jsonify({
-            'message': 'Registration successful! Please check your email for verification code.',
+            'message': 'Registration successful! Please check your email for the verification code.',
             'user_id': user_id,
-            'email': data['email']
+            'email': data['email'],
+            'otp_sent': True
         }), 201
         
     except Exception as e:

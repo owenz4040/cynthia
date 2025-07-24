@@ -35,35 +35,33 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const result = await response.json();
             
-            if (response.ok) {
+            if (response.ok && result.otp_sent) {
                 currentEmail = data.email;
                 currentUserName = data.name;
-                
                 // Update verification modal with user email
                 document.getElementById('userEmail').textContent = currentEmail;
-                
                 // Show verification modal
                 closeModal('registerModal');
                 showModal('verificationModal');
-                
                 // Focus first OTP input
                 const firstOtpInput = otpContainer.querySelector('.otp-input');
                 if (firstOtpInput) {
                     firstOtpInput.focus();
                 }
+                // Success notification
+                showNotification(`🎉 Registration successful! Welcome ${currentUserName}! Please check your email (${currentEmail}) for the 6-digit verification code.`, 'success', 8000);
+                // Log successful registration for debugging
+                console.log('✅ User registered successfully:', {
+                    email: currentEmail,
+                    name: currentUserName,
+                    timestamp: new Date().toISOString()
+                });
             } else {
-                throw new Error(result.error || 'Registration failed');
+                // Show error if OTP not sent
+                let errorMsg = result.error || 'Registration failed. Could not send verification email.';
+                showNotification(`❌ ${errorMsg}`, 'error', 8000);
+                throw new Error(errorMsg);
             }
-            
-            // Enhanced success notification with details
-            showNotification(`🎉 Registration successful! Welcome ${currentUserName}! Please check your email (${currentEmail}) for the 6-digit verification code.`, 'success', 8000);
-            
-            // Log successful registration for debugging
-            console.log('✅ User registered successfully:', {
-                email: currentEmail,
-                name: currentUserName,
-                timestamp: new Date().toISOString()
-            });
             
         } catch (error) {
             console.error('❌ Registration error:', error);
