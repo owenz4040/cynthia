@@ -752,20 +752,20 @@ async function deleteUser(userId, userName) {
         const response = await fetch(`${API_BASE_URL}/admin/users/${userId}`, {
             method: 'DELETE',
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('admin_token')}`,
+                'Authorization': `Bearer ${authToken}`,
                 'Content-Type': 'application/json'
             }
         });
 
         if (response.ok) {
-            showNotification(`User "${userName}" deleted successfully!`, 'success');
+            showToast(`User "${userName}" deleted successfully!`, 'success');
             loadUsers(); // Reload users table
         } else {
             throw new Error('Failed to delete user');
         }
     } catch (error) {
         console.error('Error deleting user:', error);
-        showNotification('Failed to delete user. Please try again.', 'error');
+        showToast('Failed to delete user. Please try again.', 'error');
     }
 }
 
