@@ -1,3 +1,23 @@
+// Utility function for safe DOM element access
+function safeGetElement(id, context = 'element') {
+    const element = document.getElementById(id);
+    if (!element) {
+        console.error(`${context} with ID '${id}' not found!`);
+        return null;
+    }
+    return element;
+}
+
+// Utility function for safe element display
+function safeSetDisplay(elementId, displayValue, context = 'element') {
+    const element = safeGetElement(elementId, context);
+    if (element) {
+        element.style.display = displayValue;
+        return true;
+    }
+    return false;
+}
+
 // Debug function to test admin authentication
 async function testAdminAuth() {
     console.log('Testing admin authentication...');
@@ -50,15 +70,36 @@ const appState = {
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
-    checkAuthAndShowPage();
-    setupEventListeners();
+    try {
+        console.log('🚀 Initializing Admin Panel...');
+        checkAuthAndShowPage();
+        setupEventListeners();
+        console.log('✅ Admin Panel initialized successfully');
+    } catch (error) {
+        console.error('❌ Error initializing Admin Panel:', error);
+        // Fallback: show login form directly if anything fails
+        const authContainer = document.querySelector('.auth-container');
+        const dashboardPage = document.getElementById('dashboardPage');
+        
+        if (authContainer) {
+            authContainer.style.display = 'block';
+        }
+        if (dashboardPage) {
+            dashboardPage.style.display = 'none';
+        }
+    }
 });
 
 // Check authentication and show appropriate page
 function checkAuthAndShowPage() {
+    console.log('🔍 Checking authentication status...');
+    console.log('📝 Auth token:', authToken ? 'Present' : 'Not found');
+    
     if (authToken) {
+        console.log('🔐 User authenticated, showing dashboard');
         showDashboard();
     } else {
+        console.log('🔓 No authentication, showing login');
         showLogin();
     }
 }
@@ -96,33 +137,81 @@ function setupEventListeners() {
 
 // Show login page
 function showLogin() {
+    console.log('📱 Attempting to show login page...');
     hideAllPages();
-    document.getElementById('loginPage').style.display = 'block';
-    appState.currentPage = 'login';
+    
+    const loginPage = document.getElementById('loginPage');
+    console.log('🔍 Login page element:', loginPage);
+    
+    if (loginPage) {
+        loginPage.style.display = 'block';
+        appState.currentPage = 'login';
+        console.log('✅ Login page displayed successfully');
+    } else {
+        console.error('❌ Login page element not found. Checking for auth-container...');
+        // Fallback: show auth-container if loginPage doesn't exist
+        const authContainer = document.querySelector('.auth-container');
+        console.log('🔍 Auth container element:', authContainer);
+        
+        if (authContainer) {
+            authContainer.style.display = 'block';
+            appState.currentPage = 'login';
+            console.log('✅ Auth container displayed as fallback');
+        } else {
+            console.error('❌ Neither loginPage nor auth-container found!');
+            console.log('🔍 Available elements with IDs:', 
+                Array.from(document.querySelectorAll('[id]')).map(el => el.id)
+            );
+        }
+    }
 }
 
 // Show dashboard page
 function showDashboard() {
     hideAllPages();
-    document.getElementById('dashboardPage').style.display = 'block';
-    appState.currentPage = 'dashboard';
-    loadDashboardStats();
+    const dashboardPage = document.getElementById('dashboardPage');
+    if (dashboardPage) {
+        dashboardPage.style.display = 'block';
+        appState.currentPage = 'dashboard';
+        loadDashboardStats();
+    } else {
+        console.error('Dashboard page element not found!');
+        // Redirect to login if dashboard page doesn't exist
+        showLogin();
+    }
 }
 
 // Show houses page
 function showHouses() {
     hideAllPages();
-    document.getElementById('housesPage').style.display = 'block';
-    appState.currentPage = 'houses';
-    loadHouses();
+    const housesPage = document.getElementById('housesPage');
+    if (housesPage) {
+        housesPage.style.display = 'block';
+        appState.currentPage = 'houses';
+        loadHouses();
+    } else {
+        console.error('Houses page element not found!');
+        showDashboard(); // Fallback to dashboard
+    }
 }
 
 // Hide all pages
 function hideAllPages() {
-    const pages = document.querySelectorAll('.page');
-    pages.forEach(page => {
-        page.style.display = 'none';
-    });
+    try {
+        // Hide pages with class 'page'
+        const pages = document.querySelectorAll('.page');
+        pages.forEach(page => {
+            page.style.display = 'none';
+        });
+        
+        // Also hide auth-container if it exists (for compatibility)
+        const authContainer = document.querySelector('.auth-container');
+        if (authContainer && !authContainer.classList.contains('page')) {
+            authContainer.style.display = 'none';
+        }
+    } catch (error) {
+        console.error('Error hiding pages:', error);
+    }
 }
 
 // Handle login form submission
@@ -592,8 +681,14 @@ function capitalizeFirst(str) {
 
 function showUsers() {
     hideAllPages();
-    document.getElementById('usersPage').style.display = 'block';
-    loadUsers();
+    const usersPage = document.getElementById('usersPage');
+    if (usersPage) {
+        usersPage.style.display = 'block';
+        loadUsers();
+    } else {
+        console.error('Users page element not found!');
+        showDashboard(); // Fallback to dashboard
+    }
 }
 
 async function loadUsers() {
