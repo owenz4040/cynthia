@@ -1,0 +1,29 @@
+{
+  "name": "rental-house-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for Rental House Booking System with AI Chatbot",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "dev": "python -m http.server 8000",
+    "build": "echo 'No build step required for vanilla JS frontend'"
+  },
+  "keywords": [
+    "rental",
+    "property",
+    "booking",
+    "instagram-design",
+    "chatbot",
+    "ai"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/rental-system.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/rental-system/issues"
+  },
+  "homepage": "https://github.com/your-username/rental-system#readme"
+}

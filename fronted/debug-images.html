@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Debug Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .debug-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .result {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .image-test {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .image-test img {
+            max-width: 200px;
+            height: 150px;
+            object-fit: cover;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>🖼️ Image Debug Tool</h1>
+    
+    <div class="debug-section">
+        <h3>📡 API Response Debug</h3>
+        <button class="test-button" onclick="testAPI()">Test Houses API</button>
+        <div id="apiResult"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h3>🖼️ Image Loading Test</h3>
+        <button class="test-button" onclick="testImageDisplay()">Test Image Display</button>
+        <div id="imageResult"></div>
+        <div class="image-test" id="imageTest"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h3>☁️ Cloudinary Test</h3>
+        <button class="test-button" onclick="testCloudinaryDirect()">Test Cloudinary Direct</button>
+        <div id="cloudinaryResult"></div>
+        <div class="image-test" id="cloudinaryTest"></div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000/api';
+        
+        async function testAPI() {
+            const resultDiv = document.getElementById('apiResult');
+            
+            try {
+                // Try to get user token first
+                let token = localStorage.getItem('token');
+                if (!token) {
+                    // Try admin token
+                    token = localStorage.getItem('adminToken');
+                }
+                
+                if (!token) {
+                    resultDiv.innerHTML = '<div class="result">❌ No authentication token found. Please login first.</div>';
+                    return;
+                }
+                
+                const response = await fetch(`${API_BASE_URL}/houses?per_page=5`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `<div class="result">✅ API Response:
+${JSON.stringify(data, null, 2)}</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="result">❌ API Error: ${JSON.stringify(data, null, 2)}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result">❌ Request Error: ${error.message}</div>`;
+            }
+        }
+        
+        async function testImageDisplay() {
+            const resultDiv = document.getElementById('imageResult');
+            const imageTestDiv = document.getElementById('imageTest');
+            
+            try {
+                let token = localStorage.getItem('token') || localStorage.getItem('adminToken');
+                
+                if (!token) {
+                    resultDiv.innerHTML = '<div class="result">❌ No authentication token found.</div>';
+                    return;
+                }
+                
+                const response = await fetch(`${API_BASE_URL}/houses?per_page=5`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.houses) {
+                    let imageCount = 0;
+                    imageTestDiv.innerHTML = '';
+                    
+                    data.houses.forEach((house, index) => {
+                        const images = house.images || [];
+                        if (images.length > 0) {
+                            images.forEach((image, imgIndex) => {
+                                imageCount++;
+                                const img = document.createElement('img');
+                                
+                                // Handle different image structure possibilities
+                                let imageUrl;
+                                if (typeof image === 'string') {
+                                    imageUrl = image;
+                                } else if (image && image.url) {
+                                    imageUrl = image.url;
+                                } else if (image && image.image_url) {
+                                    imageUrl = image.image_url;
+                                } else {
+                                    imageUrl = 'https://via.placeholder.com/200x150?text=Invalid+Structure';
+                                }
+                                
+                                img.src = imageUrl;
+                                img.alt = `${house.name} - Image ${imgIndex + 1}`;
+                                img.title = `House: ${house.name}, URL: ${imageUrl}`;
+                                
+                                img.onerror = function() {
+                                    this.style.border = '2px solid red';
+                                    this.title = `FAILED: ${imageUrl}`;
+                                };
+                                
+                                img.onload = function() {
+                                    this.style.border = '2px solid green';
+                                };
+                                
+                                imageTestDiv.appendChild(img);
+                            });
+                        }
+                    });
+                    
+                    resultDiv.innerHTML = `<div class="result">✅ Found ${imageCount} images to test</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="result">❌ No houses found or API error</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result">❌ Error: ${error.message}</div>`;
+            }
+        }
+        
+        async function testCloudinaryDirect() {
+            const resultDiv = document.getElementById('cloudinaryResult');
+            const cloudinaryTestDiv = document.getElementById('cloudinaryTest');
+            
+            // Test some common Cloudinary URL patterns
+            const testUrls = [
+                'https://res.cloudinary.com/dyltquwth/image/upload/v1/rental_houses/sample_1.jpg',
+                'https://res.cloudinary.com/dyltquwth/image/upload/sample',
+                'https://res.cloudinary.com/dyltquwth/image/upload/c_fill,w_300,h_200/sample'
+            ];
+            
+            cloudinaryTestDiv.innerHTML = '';
+            
+            testUrls.forEach((url, index) => {
+                const img = document.createElement('img');
+                img.src = url;
+                img.alt = `Test Image ${index + 1}`;
+                img.title = url;
+                
+                img.onerror = function() {
+                    this.style.border = '2px solid red';
+                    this.title = `FAILED: ${url}`;
+                };
+                
+                img.onload = function() {
+                    this.style.border = '2px solid green';
+                };
+                
+                cloudinaryTestDiv.appendChild(img);
+            });
+            
+            resultDiv.innerHTML = '<div class="result">✅ Testing Cloudinary URLs...</div>';
+        }
+    </script>
+</body>
+</html>

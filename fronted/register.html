@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - Rental System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/chatbot.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="logo">
+                    <i class="fas fa-home"></i>
+                    <h1>Rental System</h1>
+                </div>
+                <h2>Create your account</h2>
+                <p>Join us to find your perfect rental home</p>
+            </div>
+
+            <form id="registerForm" class="auth-form">
+                <div class="form-group">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="name" name="name" placeholder="Full Name" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" name="email" placeholder="Email" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <div class="input-group">
+                            <i class="fas fa-calendar"></i>
+                            <input type="number" id="age" name="age" placeholder="Age" min="18" max="120" required>
+                        </div>
+                    </div>
+                    <div class="form-group half">
+                        <div class="input-group">
+                            <i class="fas fa-venus-mars"></i>
+                            <select id="gender" name="gender" required>
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" name="password" placeholder="Password" required>
+                        <span class="password-toggle" onclick="togglePassword('password')">
+                            <i class="fas fa-eye"></i>
+                        </span>
+                    </div>
+                    <small class="help-text">Password must be at least 8 characters long</small>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" required>
+                        <span class="password-toggle" onclick="togglePassword('confirmPassword')">
+                            <i class="fas fa-eye"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-group file-input">
+                        <i class="fas fa-camera"></i>
+                        <input type="file" id="profileImage" name="profileImage" accept="image/*">
+                        <label for="profileImage">
+                            <span class="file-text">Choose Profile Picture (Optional)</span>
+                            <span class="file-button">Browse</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="auth-btn" id="registerBtn">
+                    <span class="btn-text">Create Account</span>
+                    <span class="btn-loading" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i> Creating...
+                    </span>
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                <p>Already have an account? <a href="login.html">Sign in</a></p>
+                <p><a href="admin.html">Admin Login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Verification Modal -->
+    <div id="verificationModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-envelope-circle-check"></i> Verify Your Email</h3>
+            </div>
+            <div class="modal-body">
+                <p>We've sent a verification code to <strong id="userEmail"></strong></p>
+                <p>Please enter the 6-digit code below:</p>
+                
+                <form id="verificationForm">
+                    <div class="form-group">
+                        <div class="otp-input-container">
+                            <input type="text" class="otp-input" maxlength="1" />
+                            <input type="text" class="otp-input" maxlength="1" />
+                            <input type="text" class="otp-input" maxlength="1" />
+                            <input type="text" class="otp-input" maxlength="1" />
+                            <input type="text" class="otp-input" maxlength="1" />
+                            <input type="text" class="otp-input" maxlength="1" />
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="auth-btn" id="verifyBtn">
+                        <span class="btn-text">Verify Email</span>
+                        <span class="btn-loading" style="display: none;">
+                            <i class="fas fa-spinner fa-spin"></i> Verifying...
+                        </span>
+                    </button>
+                </form>
+                
+                <div class="resend-section">
+                    <p>Didn't receive the code?</p>
+                    <button type="button" class="resend-btn" id="resendBtn">
+                        <i class="fas fa-refresh"></i> Resend Code
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal" style="display: none;">
+        <div class="modal-content success">
+            <div class="modal-header">
+                <h3><i class="fas fa-check-circle"></i> Welcome!</h3>
+            </div>
+            <div class="modal-body">
+                <p>Your account has been created successfully!</p>
+                <p>You can now sign in to start browsing rental properties.</p>
+                <button class="auth-btn" onclick="window.location.href='login.html'">
+                    Continue to Login
+                </button>
+            </div>
+        </div>
+    </div>
+
+   
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/register.js"></script>
+    <script src="js/chatbot.js"></script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - Rental System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/chatbot.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="logo">
+                    <i class="fas fa-home"></i>
+                    <h1>Rental System</h1>
+                </div>
+                <h2>Welcome back</h2>
+                <p>Sign in to your account</p>
+            </div>
+
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" name="email" placeholder="Email" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" name="password" placeholder="Password" required>
+                        <span class="password-toggle" onclick="togglePassword('password')">
+                            <i class="fas fa-eye"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox" id="rememberMe">
+                        <span class="checkmark"></span>
+                        Remember me
+                    </label>
+                    <a href="#" class="forgot-password">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="auth-btn" id="loginBtn">
+                    <span class="btn-text">Sign In</span>
+                    <span class="btn-loading" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i> Signing in...
+                    </span>
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                <p>Don't have an account? <a href="register.html">Create one</a></p>
+                <p><a href="admin.html">Admin Login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Verification Required Modal -->
+    <div id="verificationRequiredModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-envelope-circle-check"></i> Email Verification Required</h3>
+            </div>
+            <div class="modal-body">
+                <p>Your email address hasn't been verified yet.</p>
+                <p>Please check your email for a verification code or request a new one.</p>
+                
+                <form id="resendVerificationForm">
+                    <input type="hidden" id="userEmailForResend" />
+                    <button type="submit" class="auth-btn">
+                        <i class="fas fa-envelope"></i> Resend Verification Code
+                    </button>
+                </form>
+                
+                <div class="verification-form" style="display: none;">
+                    <p>Enter the verification code:</p>
+                    <form id="quickVerificationForm">
+                        <div class="form-group">
+                            <div class="otp-input-container">
+                                <input type="text" class="otp-input" maxlength="1" />
+                                <input type="text" class="otp-input" maxlength="1" />
+                                <input type="text" class="otp-input" maxlength="1" />
+                                <input type="text" class="otp-input" maxlength="1" />
+                                <input type="text" class="otp-input" maxlength="1" />
+                                <input type="text" class="otp-input" maxlength="1" />
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="auth-btn">
+                            <span class="btn-text">Verify Email</span>
+                            <span class="btn-loading" style="display: none;">
+                                <i class="fas fa-spinner fa-spin"></i> Verifying...
+                            </span>
+                        </button>
+                    </form>
+                </div>
+                
+                <button class="close-modal" onclick="closeModal('verificationRequiredModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/login.js"></script>
+    <script src="js/chatbot.js"></script>
+</body>
+</html>

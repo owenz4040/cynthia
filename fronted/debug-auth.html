@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Admin Authentication</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .debug-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        .test-button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover { background: #2980b9; }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <div class="debug-container">
+        <h1>🔧 Admin Authentication Debug Tool</h1>
+        
+        <div class="test-section">
+            <h3>📊 Current Status</h3>
+            <button class="test-button" onclick="checkAuthStatus()">Check Auth Status</button>
+            <div id="authStatus"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🔑 Admin Login Test</h3>
+            <input type="email" id="adminEmail" placeholder="Admin Email" value="admin@rentalsystem.com">
+            <input type="password" id="adminPassword" placeholder="Admin Password" value="admin123">
+            <button class="test-button" onclick="testAdminLogin()">Test Login</button>
+            <div id="loginResult"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>👥 Users Endpoint Test</h3>
+            <button class="test-button" onclick="testUsersEndpoint()">Test /api/admin/users</button>
+            <div id="usersResult"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🏠 Houses Endpoint Test</h3>
+            <button class="test-button" onclick="testHousesEndpoint()">Test /api/admin/houses</button>
+            <div id="housesResult"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>📈 Stats Endpoint Test</h3>
+            <button class="test-button" onclick="testStatsEndpoint()">Test /api/admin/stats</button>
+            <div id="statsResult"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🏡 User Houses Test</h3>
+            <p>First login as user, then test:</p>
+            <input type="email" id="userEmail" placeholder="User Email">
+            <input type="password" id="userPassword" placeholder="User Password">
+            <button class="test-button" onclick="testUserLogin()">User Login</button>
+            <button class="test-button" onclick="testUserHouses()">Test User Houses</button>
+            <div id="userHousesResult"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000/api';
+        
+        function showResult(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `<div class="result ${type}">${message}</div>`;
+        }
+        
+        function checkAuthStatus() {
+            const adminToken = localStorage.getItem('adminToken');
+            const userToken = localStorage.getItem('token');
+            
+            let status = `
+                <strong>Admin Token:</strong> ${adminToken ? '✅ Present' : '❌ Missing'}<br>
+                <strong>User Token:</strong> ${userToken ? '✅ Present' : '❌ Missing'}<br>
+            `;
+            
+            if (adminToken) {
+                status += `<strong>Admin Token Preview:</strong> ${adminToken.substring(0, 50)}...<br>`;
+            }
+            
+            showResult('authStatus', status, adminToken ? 'success' : 'error');
+        }
+        
+        async function testAdminLogin() {
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/admin/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    localStorage.setItem('adminToken', data.access_token);
+                    showResult('loginResult', `✅ Login successful!<br>Token: ${data.access_token.substring(0, 50)}...`, 'success');
+                } else {
+                    showResult('loginResult', `❌ Login failed: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showResult('loginResult', `❌ Login error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testUsersEndpoint() {
+            const token = localStorage.getItem('adminToken');
+            
+            if (!token) {
+                showResult('usersResult', '❌ No admin token found. Please login first.', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/admin/users`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('usersResult', `✅ Users loaded: ${data.users.length} users found`, 'success');
+                } else {
+                    showResult('usersResult', `❌ Failed: ${data.error} (Status: ${response.status})`, 'error');
+                }
+            } catch (error) {
+                showResult('usersResult', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testHousesEndpoint() {
+            const token = localStorage.getItem('adminToken');
+            
+            if (!token) {
+                showResult('housesResult', '❌ No admin token found. Please login first.', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/admin/houses`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('housesResult', `✅ Houses loaded: ${data.houses ? data.houses.length : 0} houses found`, 'success');
+                } else {
+                    showResult('housesResult', `❌ Failed: ${data.error} (Status: ${response.status})`, 'error');
+                }
+            } catch (error) {
+                showResult('housesResult', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testStatsEndpoint() {
+            const token = localStorage.getItem('adminToken');
+            
+            if (!token) {
+                showResult('statsResult', '❌ No admin token found. Please login first.', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/admin/stats`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('statsResult', `✅ Stats loaded: ${JSON.stringify(data)}`, 'success');
+                } else {
+                    showResult('statsResult', `❌ Failed: ${data.error} (Status: ${response.status})`, 'error');
+                }
+            } catch (error) {
+                showResult('statsResult', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testUserLogin() {
+            const email = document.getElementById('userEmail').value;
+            const password = document.getElementById('userPassword').value;
+            
+            if (!email || !password) {
+                showResult('userHousesResult', '❌ Please enter user email and password', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    showResult('userHousesResult', `✅ User login successful!`, 'success');
+                } else {
+                    showResult('userHousesResult', `❌ User login failed: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showResult('userHousesResult', `❌ User login error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testUserHouses() {
+            const token = localStorage.getItem('token');
+            
+            if (!token) {
+                showResult('userHousesResult', '❌ No user token found. Please login as user first.', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/houses?per_page=12`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('userHousesResult', `✅ User houses loaded: ${data.houses ? data.houses.length : 0} houses found`, 'success');
+                } else {
+                    showResult('userHousesResult', `❌ Failed: ${data.error || 'Unknown error'} (Status: ${response.status})`, 'error');
+                }
+            } catch (error) {
+                showResult('userHousesResult', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Auto-check status on load
+        document.addEventListener('DOMContentLoaded', checkAuthStatus);
+    </script>
+</body>
+</html>

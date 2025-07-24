@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms & Conditions - Rental System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="terms-container">
+        <div class="terms-card">
+            <div class="terms-header">
+                <div class="logo">
+                    <i class="fas fa-home"></i>
+                    <h1>Rental System</h1>
+                </div>
+                <h2>Terms & Conditions</h2>
+                <p>Please read and accept our terms to continue</p>
+            </div>
+
+            <div class="terms-content">
+                <div class="terms-section">
+                    <h3><i class="fas fa-shield-alt"></i> Privacy & Data Protection</h3>
+                    <ul>
+                        <li>We collect and store your personal information securely</li>
+                        <li>Your data is used only for rental services and communication</li>
+                        <li>We do not share your information with third parties without consent</li>
+                        <li>You can request data deletion at any time</li>
+                    </ul>
+                </div>
+
+                <div class="terms-section">
+                    <h3><i class="fas fa-home"></i> Rental Services</h3>
+                    <ul>
+                        <li>All rental properties are verified by our team</li>
+                        <li>Booking confirmations are subject to availability</li>
+                        <li>Payment terms will be communicated for each booking</li>
+                        <li>Cancellation policies vary by property</li>
+                    </ul>
+                </div>
+
+                <div class="terms-section">
+                    <h3><i class="fas fa-user-shield"></i> User Responsibilities</h3>
+                    <ul>
+                        <li>Provide accurate and truthful information</li>
+                        <li>Respect property rules and regulations</li>
+                        <li>Report any issues or damages immediately</li>
+                        <li>Maintain account security and confidentiality</li>
+                    </ul>
+                </div>
+
+                <div class="terms-section">
+                    <h3><i class="fas fa-gavel"></i> Legal Terms</h3>
+                    <ul>
+                        <li>These terms are governed by applicable local laws</li>
+                        <li>Disputes will be resolved through appropriate legal channels</li>
+                        <li>We reserve the right to update terms with notice</li>
+                        <li>Continued use implies acceptance of updated terms</li>
+                    </ul>
+                </div>
+
+                <div class="terms-section">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Liability & Disclaimers</h3>
+                    <ul>
+                        <li>We act as a platform connecting renters and property owners</li>
+                        <li>Property condition and safety are the owner's responsibility</li>
+                        <li>Users book properties at their own risk and discretion</li>
+                        <li>We provide support but are not liable for property-related issues</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="terms-acceptance">
+                <div class="checkbox-group">
+                    <label class="terms-checkbox">
+                        <input type="checkbox" id="acceptTerms" required>
+                        <span class="checkmark"></span>
+                        <span class="checkbox-text">
+                            I have read and agree to the <strong>Terms & Conditions</strong> and <strong>Privacy Policy</strong>
+                        </span>
+                    </label>
+                </div>
+
+                <div class="terms-actions">
+                    <button type="button" class="btn-secondary" id="declineBtn">
+                        <i class="fas fa-times"></i> Decline
+                    </button>
+                    <button type="button" class="auth-btn" id="acceptBtn" disabled>
+                        <span class="btn-text">
+                            <i class="fas fa-check"></i> Accept & Continue
+                        </span>
+                        <span class="btn-loading" style="display: none;">
+                            <i class="fas fa-spinner fa-spin"></i> Processing...
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="terms-footer">
+                <p>
+                    <i class="fas fa-info-circle"></i>
+                    By accepting these terms, you agree to use our platform responsibly and in accordance with all applicable laws.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Decline Confirmation Modal -->
+    <div id="declineModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> Confirm Decline</h3>
+            </div>
+            <div class="modal-body">
+                <p>You must accept the terms and conditions to use our rental platform.</p>
+                <p>If you decline, you will be logged out and redirected to the login page.</p>
+                
+                <div class="modal-actions">
+                    <button class="btn-secondary" onclick="closeModal('declineModal')">
+                        Cancel
+                    </button>
+                    <button class="btn-danger" id="confirmDeclineBtn">
+                        <i class="fas fa-sign-out-alt"></i> Decline & Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/terms.js"></script>
+</body>
+</html>

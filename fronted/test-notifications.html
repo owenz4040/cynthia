@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Notifications - Rental System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <style>
+        .test-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            margin: 10px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .test-button.success { background: #10b981; color: white; }
+        .test-button.error { background: #ef4444; color: white; }
+        .test-button.warning { background: #f59e0b; color: white; }
+        .test-button.info { background: #3b82f6; color: white; }
+        .test-button:hover { transform: translateY(-2px); }
+        .endpoint-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+        }
+        .endpoint-title {
+            color: #1f2937;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-online { background: #10b981; }
+        .status-offline { background: #ef4444; }
+        .status-loading { background: #f59e0b; animation: pulse 2s infinite; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Rental System - Notification & Endpoint Testing</h1>
+        <p>Test all notifications and verify API endpoints are working correctly.</p>
+        
+        <!-- Notification Tests -->
+        <div class="endpoint-section">
+            <h2 class="endpoint-title">🔔 Notification System Tests</h2>
+            <button class="test-button success" onclick="testSuccessNotification()">Test Success Notification</button>
+            <button class="test-button error" onclick="testErrorNotification()">Test Error Notification</button>
+            <button class="test-button warning" onclick="testWarningNotification()">Test Warning Notification</button>
+            <button class="test-button info" onclick="testInfoNotification()">Test Info Notification</button>
+        </div>
+        
+        <!-- API Endpoint Tests -->
+        <div class="endpoint-section">
+            <h2 class="endpoint-title">🔌 API Endpoint Status</h2>
+            <div id="endpointStatus">
+                <div class="endpoint-item">
+                    <span class="status-indicator status-loading" id="healthStatus"></span>
+                    <strong>Health Check:</strong> <span id="healthText">Testing...</span>
+                </div>
+                <div class="endpoint-item">
+                    <span class="status-indicator status-loading" id="registerStatus"></span>
+                    <strong>Registration Endpoint:</strong> <span id="registerText">Testing...</span>
+                </div>
+                <div class="endpoint-item">
+                    <span class="status-indicator status-loading" id="loginStatus"></span>
+                    <strong>Login Endpoint:</strong> <span id="loginText">Testing...</span>
+                </div>
+                <div class="endpoint-item">
+                    <span class="status-indicator status-loading" id="verifyStatus"></span>
+                    <strong>Email Verification:</strong> <span id="verifyText">Testing...</span>
+                </div>
+                <div class="endpoint-item">
+                    <span class="status-indicator status-loading" id="termsStatus"></span>
+                    <strong>Terms Acceptance:</strong> <span id="termsText">Testing...</span>
+                </div>
+            </div>
+            <button class="test-button info" onclick="testAllEndpoints()">🔄 Refresh Endpoint Tests</button>
+        </div>
+        
+        <!-- Quick Registration Test -->
+        <div class="endpoint-section">
+            <h2 class="endpoint-title">🚀 Quick Registration Test</h2>
+            <p>Test the complete registration flow with sample data:</p>
+            <button class="test-button success" onclick="testQuickRegistration()">Test Complete Registration Flow</button>
+        </div>
+        
+        <!-- Navigation -->
+        <div class="endpoint-section">
+            <h2 class="endpoint-title">🧭 Quick Navigation</h2>
+            <button class="test-button info" onclick="window.location.href='home.html'">🏠 Landing Page</button>
+            <button class="test-button info" onclick="window.location.href='register.html'">📝 Registration</button>
+            <button class="test-button info" onclick="window.location.href='login.html'">🔑 Login</button>
+            <button class="test-button info" onclick="window.location.href='dashboard.html'">📊 Dashboard</button>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        // Test notification functions
+        function testSuccessNotification() {
+            showNotification('✅ This is a success notification! Everything is working perfectly.', 'success', 5000);
+        }
+        
+        function testErrorNotification() {
+            showNotification('❌ This is an error notification! Something went wrong.', 'error', 5000);
+        }
+        
+        function testWarningNotification() {
+            showNotification('⚠️ This is a warning notification! Please pay attention.', 'warning', 5000);
+        }
+        
+        function testInfoNotification() {
+            showNotification('ℹ️ This is an info notification! Here\'s some information.', 'info', 5000);
+        }
+        
+        // Test API endpoints
+        async function testEndpoint(url, method = 'GET', body = null, expectAuth = false) {
+            try {
+                const options = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                };
+                
+                if (body) {
+                    options.body = JSON.stringify(body);
+                }
+                
+                const response = await fetch(`http://localhost:5000/api${url}`, options);
+                const data = await response.text();
+                
+                if (response.ok) {
+                    return { status: 'online', message: 'OK' };
+                } else if (response.status === 401 && expectAuth) {
+                    return { status: 'online', message: 'Protected (requires auth)' };
+                } else if (response.status === 400) {
+                    return { status: 'online', message: 'Expecting data' };
+                } else {
+                    return { status: 'error', message: `HTTP ${response.status}` };
+                }
+            } catch (error) {
+                return { status: 'offline', message: 'Connection failed' };
+            }
+        }
+        
+        async function testAllEndpoints() {
+            // Test health check (houses endpoint without auth)
+            const health = await testEndpoint('/houses', 'GET', null, true);
+            updateEndpointStatus('health', health);
+            
+            // Test registration endpoint
+            const register = await testEndpoint('/register', 'POST', {});
+            updateEndpointStatus('register', register);
+            
+            // Test login endpoint
+            const login = await testEndpoint('/login', 'POST', {});
+            updateEndpointStatus('login', login);
+            
+            // Test verify endpoint
+            const verify = await testEndpoint('/verify-email', 'POST', {});
+            updateEndpointStatus('verify', verify);
+            
+            // Test terms endpoint
+            const terms = await testEndpoint('/accept-terms', 'POST', null, true);
+            updateEndpointStatus('terms', terms);
+            
+            showNotification('🔍 Endpoint testing completed! Check the results above.', 'info', 3000);
+        }
+        
+        function updateEndpointStatus(endpoint, result) {
+            const statusElement = document.getElementById(`${endpoint}Status`);
+            const textElement = document.getElementById(`${endpoint}Text`);
+            
+            statusElement.className = 'status-indicator';
+            
+            if (result.status === 'online') {
+                statusElement.classList.add('status-online');
+                textElement.textContent = `✅ ${result.message}`;
+                textElement.style.color = '#10b981';
+            } else if (result.status === 'error') {
+                statusElement.classList.add('status-offline');
+                textElement.textContent = `⚠️ ${result.message}`;
+                textElement.style.color = '#f59e0b';
+            } else {
+                statusElement.classList.add('status-offline');
+                textElement.textContent = `❌ ${result.message}`;
+                textElement.style.color = '#ef4444';
+            }
+        }
+        
+        async function testQuickRegistration() {
+            showNotification('🧪 Testing registration with sample data...', 'info', 3000);
+            
+            const testData = {
+                name: 'Test User ' + Math.floor(Math.random() * 1000),
+                email: `test${Math.floor(Math.random() * 10000)}@example.com`,
+                age: 25,
+                gender: 'Other',
+                password: 'TestPassword123!',
+                confirmPassword: 'TestPassword123!'
+            };
+            
+            try {
+                const response = await AuthUtils.apiRequest('/register', {
+                    method: 'POST',
+                    body: JSON.stringify(testData)
+                });
+                
+                showNotification(`🎉 Registration test successful! Test user created: ${testData.name} (${testData.email})`, 'success', 8000);
+                console.log('✅ Test registration successful:', testData);
+                
+            } catch (error) {
+                showNotification(`❌ Registration test failed: ${error.message}`, 'error', 6000);
+                console.error('❌ Test registration failed:', error);
+            }
+        }
+        
+        // Auto-test endpoints on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(testAllEndpoints, 1000);
+            showNotification('🧪 Welcome to the testing page! Running endpoint tests...', 'info', 4000);
+        });
+    </script>
+</body>
+</html>
