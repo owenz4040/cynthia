@@ -347,7 +347,7 @@
 
     <!-- Get Started Modal -->
     <div id="getStartedModal" class="modal" style="display: none;">
-        <div class="modal-content">
+        <div class="modal-content auth-modal">
             <div class="modal-header">
                 <h3><i class="fas fa-rocket"></i> Get Started with Rental System</h3>
                 <button class="close-modal" onclick="closeModal('getStartedModal')">
@@ -355,30 +355,113 @@
                 </button>
             </div>
             <div class="modal-body">
-                <p>Choose how you'd like to get started:</p>
-                
-                <div class="get-started-options">
-                    <div class="option-card" onclick="window.location.href='register.html'">
-                        <div class="option-icon">
-                            <i class="fas fa-user-plus"></i>
-                        </div>
-                        <h4>Create New Account</h4>
-                        <p>New to our platform? Register now to start browsing properties.</p>
-                        <button class="option-btn">Register Now</button>
-                    </div>
-                    
-                    <div class="option-card" onclick="window.location.href='login.html'">
-                        <div class="option-icon">
-                            <i class="fas fa-sign-in-alt"></i>
-                        </div>
-                        <h4>Sign In</h4>
-                        <p>Already have an account? Sign in to access your dashboard.</p>
-                        <button class="option-btn secondary">Sign In</button>
+                <!-- Auth Toggle -->
+                <div class="auth-toggle-container">
+                    <div class="auth-toggle">
+                        <button class="toggle-btn active" id="signInToggle" onclick="showAuthForm('signin')">
+                            <i class="fas fa-sign-in-alt"></i> Sign In
+                        </button>
+                        <button class="toggle-btn" id="createAccountToggle" onclick="showAuthForm('register')">
+                            <i class="fas fa-user-plus"></i> Create Account
+                        </button>
+                        <div class="toggle-slider" id="toggleSlider"></div>
                     </div>
                 </div>
+
+                <!-- Sign In Form -->
+                <div id="signinForm" class="auth-form active">
+                    <div class="auth-form-header">
+                        <h4>Welcome Back!</h4>
+                        <p>Sign in to access your rental dashboard</p>
+                    </div>
+                    
+                    <form id="modalSigninForm">
+                        <div class="form-group">
+                            <input type="email" id="signinEmail" placeholder="Email address" required>
+                            <i class="fas fa-envelope form-icon"></i>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="password" id="signinPassword" placeholder="Password" required>
+                            <i class="fas fa-lock form-icon"></i>
+                        </div>
+                        
+                        <button type="submit" class="auth-submit-btn">
+                            <span id="signinBtnText">Sign In</span>
+                            <div id="signinSpinner" class="auth-spinner" style="display: none;"></div>
+                        </button>
+                    </form>
+                    
+                    <div class="auth-links">
+                        <a href="#" onclick="alert('Password reset functionality coming soon!')">Forgot Password?</a>
+                    </div>
+                </div>
+
+                <!-- Create Account Form -->
+                <div id="registerForm" class="auth-form">
+                    <div class="auth-form-header">
+                        <h4>Join Our Community!</h4>
+                        <p>Create your account to start your rental journey</p>
+                    </div>
+                    
+                    <form id="modalRegisterForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <input type="text" id="registerName" placeholder="Full Name" required>
+                                <i class="fas fa-user form-icon"></i>
+                            </div>
+                            <div class="form-group">
+                                <input type="number" id="registerAge" placeholder="Age" min="18" max="120" required>
+                                <i class="fas fa-calendar form-icon"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="email" id="registerEmail" placeholder="Email address" required>
+                            <i class="fas fa-envelope form-icon"></i>
+                        </div>
+                        
+                        <div class="form-group">
+                            <select id="registerGender" required>
+                                <option value="">Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <i class="fas fa-venus-mars form-icon"></i>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="password" id="registerPassword" placeholder="Password" required>
+                            <i class="fas fa-lock form-icon"></i>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="password" id="registerConfirmPassword" placeholder="Confirm Password" required>
+                            <i class="fas fa-lock form-icon"></i>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="agreeTerms" required>
+                                <span class="checkmark"></span>
+                                I agree to the <a href="terms.html" target="_blank">Terms & Conditions</a>
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="auth-submit-btn">
+                            <span id="registerBtnText">Create Account</span>
+                            <div id="registerSpinner" class="auth-spinner" style="display: none;"></div>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Error/Success Messages -->
+                <div id="authMessage" class="auth-message" style="display: none;"></div>
                 
+                <!-- Admin Option -->
                 <div class="admin-option">
-                    <p>Are you a property manager? <a href="admin-login.html">Access Admin Panel</a></p>
+                    <p>Property manager? <a href="admin-login.html">Admin Access</a></p>
                 </div>
             </div>
         </div>

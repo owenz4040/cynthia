@@ -242,6 +242,11 @@ function showModal(modalId) {
         
         document.body.style.overflow = 'hidden';
         
+        // If it's the get started modal, initialize the signin form
+        if (modalId === 'getStartedModal') {
+            setTimeout(() => showAuthForm('signin'), 100);
+        }
+        
         // Close modal when clicking outside
         modal.addEventListener('click', function(e) {
             if (e.target === modal) {
@@ -259,6 +264,16 @@ function closeModal(modalId) {
         setTimeout(() => {
             modal.style.display = 'none';
             document.body.style.overflow = 'auto';
+            
+            // Reset forms when closing
+            const forms = modal.querySelectorAll('form');
+            forms.forEach(form => form.reset());
+            
+            // Hide any messages
+            const authMessage = document.getElementById('authMessage');
+            if (authMessage) {
+                authMessage.style.display = 'none';
+            }
         }, 300);
     }
 }
@@ -881,3 +896,198 @@ window.addEventListener('resize', function() {
         }
     }
 });
+
+// Auth Modal Toggle Functions
+function showAuthForm(formType) {
+    const signinForm = document.getElementById('signinForm');
+    const registerForm = document.getElementById('registerForm');
+    const signinToggle = document.getElementById('signInToggle');
+    const createAccountToggle = document.getElementById('createAccountToggle');
+    const toggleSlider = document.getElementById('toggleSlider');
+    
+    // Clear any previous messages
+    const authMessage = document.getElementById('authMessage');
+    if (authMessage) {
+        authMessage.style.display = 'none';
+    }
+    
+    if (formType === 'signin') {
+        signinForm.classList.add('active');
+        registerForm.classList.remove('active');
+        signinToggle.classList.add('active');
+        createAccountToggle.classList.remove('active');
+        toggleSlider.classList.remove('register');
+    } else {
+        registerForm.classList.add('active');
+        signinForm.classList.remove('active');
+        createAccountToggle.classList.add('active');
+        signinToggle.classList.remove('active');
+        toggleSlider.classList.add('register');
+    }
+}
+
+// Initialize auth modal when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Set up form event listeners
+    const modalSigninForm = document.getElementById('modalSigninForm');
+    const modalRegisterForm = document.getElementById('modalRegisterForm');
+    
+    if (modalSigninForm) {
+        modalSigninForm.addEventListener('submit', handleModalSignin);
+    }
+    
+    if (modalRegisterForm) {
+        modalRegisterForm.addEventListener('submit', handleModalRegister);
+    }
+});
+
+// Handle signin form submission
+async function handleModalSignin(e) {
+    e.preventDefault();
+    
+    const email = document.getElementById('signinEmail').value;
+    const password = document.getElementById('signinPassword').value;
+    const btnText = document.getElementById('signinBtnText');
+    const spinner = document.getElementById('signinSpinner');
+    const submitBtn = e.target.querySelector('.auth-submit-btn');
+    
+    // Show loading state
+    btnText.style.display = 'none';
+    spinner.style.display = 'block';
+    submitBtn.disabled = true;
+    
+    try {
+        const apiBase = window.Config ? window.Config.API_BASE : 'https://cynthia-api.onrender.com/api';
+        
+        const response = await fetch(`${apiBase}/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            // Store token and user data
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            
+            showAuthMessage('Sign in successful! Redirecting...', 'success');
+            
+            // Redirect to dashboard after short delay
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1500);
+        } else {
+            showAuthMessage(data.error || 'Sign in failed. Please try again.', 'error');
+        }
+    } catch (error) {
+        console.error('Sign in error:', error);
+        showAuthMessage('Network error. Please check your connection and try again.', 'error');
+    } finally {
+        // Reset loading state
+        btnText.style.display = 'inline';
+        spinner.style.display = 'none';
+        submitBtn.disabled = false;
+    }
+}
+
+// Handle register form submission
+async function handleModalRegister(e) {
+    e.preventDefault();
+    
+    const name = document.getElementById('registerName').value;
+    const age = document.getElementById('registerAge').value;
+    const email = document.getElementById('registerEmail').value;
+    const gender = document.getElementById('registerGender').value;
+    const password = document.getElementById('registerPassword').value;
+    const confirmPassword = document.getElementById('registerConfirmPassword').value;
+    const agreeTerms = document.getElementById('agreeTerms').checked;
+    
+    const btnText = document.getElementById('registerBtnText');
+    const spinner = document.getElementById('registerSpinner');
+    const submitBtn = e.target.querySelector('.auth-submit-btn');
+    
+    // Validation
+    if (password !== confirmPassword) {
+        showAuthMessage('Passwords do not match!', 'error');
+        return;
+    }
+    
+    if (!agreeTerms) {
+        showAuthMessage('Please agree to the Terms & Conditions!', 'error');
+        return;
+    }
+    
+    if (parseInt(age) < 18) {
+        showAuthMessage('You must be at least 18 years old to register!', 'error');
+        return;
+    }
+    
+    // Show loading state
+    btnText.style.display = 'none';
+    spinner.style.display = 'block';
+    submitBtn.disabled = true;
+    
+    try {
+        const apiBase = window.Config ? window.Config.API_BASE : 'https://cynthia-api.onrender.com/api';
+        
+        const response = await fetch(`${apiBase}/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name,
+                age: parseInt(age),
+                email,
+                gender,
+                password,
+                confirmPassword
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            showAuthMessage('Account created successfully! Please check your email to verify your account.', 'success');
+            
+            // Reset form
+            e.target.reset();
+            
+            // Switch to signin form after delay
+            setTimeout(() => {
+                showAuthForm('signin');
+            }, 3000);
+        } else {
+            showAuthMessage(data.error || 'Registration failed. Please try again.', 'error');
+        }
+    } catch (error) {
+        console.error('Registration error:', error);
+        showAuthMessage('Network error. Please check your connection and try again.', 'error');
+    } finally {
+        // Reset loading state
+        btnText.style.display = 'inline';
+        spinner.style.display = 'none';
+        submitBtn.disabled = false;
+    }
+}
+
+// Show auth message
+function showAuthMessage(message, type) {
+    const authMessage = document.getElementById('authMessage');
+    if (authMessage) {
+        authMessage.textContent = message;
+        authMessage.className = `auth-message ${type}`;
+        authMessage.style.display = 'block';
+        
+        // Auto-hide success messages after 5 seconds
+        if (type === 'success') {
+            setTimeout(() => {
+                authMessage.style.display = 'none';
+            }, 5000);
+        }
+    }
+}
