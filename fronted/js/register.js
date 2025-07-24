@@ -1,5 +1,15 @@
 // Registration page functionality
 document.addEventListener('DOMContentLoaded', function() {
+    // Fallback: Show OTP modal if registration was successful but not verified
+    if (localStorage.getItem('pendingEmailVerification')) {
+        currentEmail = localStorage.getItem('pendingEmailVerification');
+        document.getElementById('userEmail').textContent = currentEmail;
+        showModal('verificationModal');
+        const firstOtpInput = otpContainer.querySelector('.otp-input');
+        if (firstOtpInput) {
+            firstOtpInput.focus();
+        }
+    }
     const registerForm = document.getElementById('registerForm');
     const verificationModal = document.getElementById('verificationModal');
     const verificationForm = document.getElementById('verificationForm');
@@ -38,6 +48,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (response.ok && result.otp_sent) {
                 currentEmail = data.email;
                 currentUserName = data.name;
+                // Store pending verification in localStorage for fallback
+                localStorage.setItem('pendingEmailVerification', currentEmail);
                 // Update verification modal with user email
                 document.getElementById('userEmail').textContent = currentEmail;
                 // Show verification modal
@@ -87,6 +99,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Handle email verification
     verificationForm.addEventListener('submit', async function(e) {
+        // Clear pending verification after successful verification
+        localStorage.removeItem('pendingEmailVerification');
         e.preventDefault();
         
         const otpValue = getOTPValue(otpContainer);
