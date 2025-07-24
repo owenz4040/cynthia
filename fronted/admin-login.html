@@ -9,173 +9,700 @@
     <link rel="stylesheet" href="css/dashboard.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* Enhanced mobile styles for admin login */
-        @media (max-width: 768px) {
+        /* Modern Admin Login Styles - Mobile First */
+        :root {
+            --primary-color: #667eea;
+            --primary-dark: #5a6fd8;
+            --secondary-color: #764ba2;
+            --accent-color: #4facfe;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-light: #9ca3af;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --border-radius: 0.75rem;
+            --border-radius-lg: 1rem;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Background Animation */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 119, 198, 0.2) 0%, transparent 50%);
+            animation: backgroundFloat 20s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes backgroundFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-10px) rotate(1deg); }
+            66% { transform: translateY(5px) rotate(-1deg); }
+        }
+
+        /* Auth Container */
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            position: relative;
+        }
+
+        /* Login Card - Mobile First */
+        .login-form-container {
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .login-card {
+            background: var(--bg-primary);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            padding: 2rem;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+        }
+
+        /* Logo Section */
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            text-decoration: none;
+            color: inherit;
+            transition: var(--transition);
+        }
+
+        .logo:hover {
+            transform: translateY(-2px);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .gradient-icon {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: iconPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes iconPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .logo h1 {
+            font-size: 1.875rem;
+            color: var(--text-primary);
+            margin: 0;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+
+        /* Admin Badge */
+        .admin-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            color: var(--text-primary);
+            background: var(--bg-primary);
+            transition: var(--transition);
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-light);
+        }
+
+        /* Input Icons */
+        .input-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            font-size: 1.125rem;
+            transition: var(--transition);
+        }
+
+        .form-input:focus + .input-icon {
+            color: var(--primary-color);
+        }
+
+        /* Login Button */
+        .login-button {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            min-height: 3.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .login-button:active {
+            transform: translateY(0);
+        }
+
+        .login-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .divider span {
+            padding: 0 1rem;
+            background: var(--bg-primary);
+            font-weight: 500;
+        }
+
+        /* Admin Info */
+        .admin-info {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            background: var(--bg-secondary);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+        }
+
+        .admin-info p {
+            margin: 0.5rem 0;
+        }
+
+        .admin-info i {
+            color: var(--primary-color);
+            margin-right: 0.5rem;
+        }
+
+        /* Footer Card */
+        .footer-card {
+            background: var(--bg-primary);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .footer-card p {
+            margin: 0.5rem 0;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .footer-links {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer-links a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        /* Error Message */
+        .error-message {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: var(--error-color);
+            padding: 0.75rem 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Success Message */
+        .success-message {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: var(--success-color);
+            padding: 0.75rem 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 640px) {
+            .auth-container {
+                padding: 0.5rem;
+                align-items: flex-start;
+                padding-top: 2rem;
+            }
+
             .login-card {
-                margin: 10px !important;
-                padding: 20px !important;
-                max-width: calc(100vw - 20px) !important;
+                padding: 1.5rem;
+                margin-bottom: 1rem;
             }
-            
+
             .logo h1 {
-                font-size: 1.8rem;
+                font-size: 1.5rem;
             }
-            
+
+            .gradient-icon {
+                font-size: 2rem;
+            }
+
             .form-input {
-                font-size: 16px; /* Prevent zoom on iOS */
-                min-height: 44px; /* iOS touch target */
+                font-size: 1rem; /* Prevents zoom on iOS */
+                min-height: 3rem; /* Better touch targets */
             }
-            
+
             .login-button {
-                min-height: 44px;
-                font-size: 16px;
+                min-height: 3rem;
+                font-size: 1rem;
             }
-            
+
             .footer-card {
-                margin: 10px !important;
-                padding: 15px !important;
-                font-size: 14px;
-            }
-            
-            .auth-footer p {
-                font-size: 14px !important;
+                padding: 1rem;
+                margin-top: 1rem;
             }
         }
-        
+
         @media (max-width: 480px) {
-            .logo h1 {
-                font-size: 1.6rem;
-            }
-            
             .auth-container {
-                padding: 5px !important;
+                padding: 0.25rem;
+                padding-top: 1rem;
             }
-            
+
+            .login-card {
+                padding: 1.25rem;
+                border-radius: 0.5rem;
+            }
+
+            .footer-card {
+                padding: 0.875rem;
+                border-radius: 0.5rem;
+            }
+
+            .logo h1 {
+                font-size: 1.375rem;
+            }
+
             .footer-card p {
-                font-size: 12px !important;
+                font-size: 0.8125rem;
+            }
+        }
+
+        /* Landscape orientation on mobile */
+        @media (max-height: 600px) and (orientation: landscape) {
+            .auth-container {
+                padding: 0.5rem;
+                align-items: center;
+            }
+
+            .logo {
+                margin-bottom: 1rem;
+            }
+
+            .form-group {
+                margin-bottom: 1rem;
+            }
+
+            .admin-badge {
+                margin-bottom: 1rem;
+            }
+        }
+
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .login-card {
+                box-shadow: 
+                    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+                    0 0 0 1px rgba(255, 255, 255, 0.05);
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --text-primary: #f9fafb;
+                --text-secondary: #d1d5db;
+                --text-light: #9ca3af;
+                --bg-primary: rgba(17, 24, 39, 0.95);
+                --bg-secondary: rgba(31, 41, 55, 0.8);
+                --bg-tertiary: rgba(55, 65, 81, 0.8);
+                --border-color: rgba(75, 85, 99, 0.8);
+            }
+
+            body {
+                background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            }
+
+            .login-card,
+            .footer-card {
+                background: var(--bg-primary);
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .form-input {
+                background: rgba(31, 41, 55, 0.5);
+                border-color: rgba(75, 85, 99, 0.8);
+                color: var(--text-primary);
+            }
+
+            .admin-info {
+                background: rgba(31, 41, 55, 0.5);
+                border-color: rgba(75, 85, 99, 0.8);
+            }
+        }
+
+        /* Reduced motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Focus management for accessibility */
+        .login-button:focus,
+        .form-input:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            .login-card {
+                border: 3px solid var(--text-primary);
+            }
+
+            .form-input {
+                border-width: 2px;
+            }
+
+            .login-button {
+                border: 2px solid var(--text-primary);
             }
         }
     </style>
 </head>
 <body>
-</html>
-                                    <i class="fas fa-home" style="font-size: 48px; color: #fff; opacity: 0.3;"></i>
-                                    <p style="color: #fff; opacity: 0.8; margin-top: 20px;">Rental System Admin</p>
-                                </div>
-                            </div>
+    <!-- Main Content Container -->
+    <div class="page-container">
+        <!-- Login Page -->
+        <div class="auth-container">
+            <div class="login-form-container">
+                <!-- Main Login Card -->
+                <div class="login-card">
+                    <!-- Logo Section -->
+                    <div class="logo">
+                        <i class="fas fa-home gradient-icon"></i>
+                        <h1>Rental System</h1>
+                    </div>
+
+                    <!-- Admin Badge -->
+                    <div style="text-align: center;">
+                        <div class="admin-badge">
+                            <i class="fas fa-shield-alt"></i>
+                            Admin Access
                         </div>
                     </div>
 
-                    <!-- Login Page Wrapper for JS show/hide -->
-                    <div id="loginPage" class="page">
-                        <div class="login-form-container">
-                            <div class="login-card">
-                                <div class="logo">
-                                    <i class="fas fa-home gradient-icon"></i>
-                                    <h1>Rental System</h1>
-                                </div>
+                    <!-- Error Message -->
+                    <div id="loginError" class="error-message" style="display: none;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span id="errorText"></span>
+                    </div>
 
-                                <div id="loginError" class="error-message" style="display: none;"></div>
+                    <!-- Success Message -->
+                    <div id="loginSuccess" class="success-message" style="display: none;">
+                        <i class="fas fa-check-circle"></i>
+                        <span id="successText"></span>
+                    </div>
 
-                                <form id="loginForm">
-                                    <div class="form-group">
-                                        <input
-                                            type="email"
-                                            id="email"
-                                            name="email"
-                                            placeholder="Email address"
-                                            class="form-input"
-                                            required
-                                        />
-                                    </div>
-
-                                    <div class="form-group">
-                                        <input
-                                            type="password"
-                                            id="password"
-                                            name="password"
-                                            placeholder="Password"
-                                            class="form-input"
-                                            required
-                                        />
-                                    </div>
-
-                                    <button type="submit" class="login-button" id="loginBtn">
-                                        <span id="loginBtnText">Sign in</span>
-                                        <div id="loginSpinner" class="loading-spinner" style="display: none;"></div>
-                                    </button>
-                                </form>
-
-                                <div class="divider">
-                                    <span>OR</span>
-                                </div>
-
-                                <div style="text-align: center; color: #8e8e8e; font-size: 12px;">
-                                    <p>Admin access only</p>
-                                    <p style="margin-top: 8px;">
-                                        <i class="fas fa-user" style="margin-right: 4px;"></i>
-                                        Manage rental properties
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="footer-card">
-                                <p>Rental System Admin Panel</p>
-                                <p style="margin-top: 8px; font-size: 12px;">
-                                    Secure access for property management
-                                </p>
-                                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #dbdbdb;">
-                                    <p style="font-size: 12px; color: #8e8e8e;">
-                                        Looking for rentals? 
-                                        <a href="register.html" style="color: #0095f6; text-decoration: none; font-weight: 500;">
-                                            Create Account
-                                        </a>
-                                        or
-                                        <a href="login.html" style="color: #0095f6; text-decoration: none; font-weight: 500;">
-                                            Sign In
-                                        </a>
-                                    </p>
-                                    <p style="font-size: 12px; color: #8e8e8e; margin-top: 10px;">
-                                        <a href="home.html" style="color: #0095f6; text-decoration: none; font-weight: 500;">
-                                            <i class="fas fa-arrow-left" style="margin-right: 5px;"></i>
-                                            Back to Main Site
-                                        </a>
-                                    </p>
-                                </div>
-                            </div>
+                    <!-- Login Form -->
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                placeholder="Admin email address"
+                                class="form-input"
+                                required
+                                autocomplete="username"
+                                inputmode="email"
+                            />
+                            <i class="fas fa-envelope input-icon"></i>
                         </div>
+
+                        <div class="form-group">
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                placeholder="Admin password"
+                                class="form-input"
+                                required
+                                autocomplete="current-password"
+                            />
+                            <i class="fas fa-lock input-icon"></i>
+                        </div>
+
+                        <button type="submit" class="login-button" id="loginBtn">
+                            <span id="loginBtnText">
+                                <i class="fas fa-sign-in-alt" style="margin-right: 0.5rem;"></i>
+                                Sign In to Admin Panel
+                            </span>
+                            <div id="loginSpinner" class="loading-spinner" style="display: none;"></div>
+                        </button>
+                    </form>
+
+                    <!-- Divider -->
+                    <div class="divider">
+                        <span>Admin Portal</span>
+                    </div>
+
+                    <!-- Admin Information -->
+                    <div class="admin-info">
+                        <p>
+                            <i class="fas fa-building"></i>
+                            <strong>Property Management System</strong>
+                        </p>
+                        <p>
+                            <i class="fas fa-users"></i>
+                            Manage users, properties & bookings
+                        </p>
+                        <p>
+                            <i class="fas fa-chart-bar"></i>
+                            View analytics & system reports
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Footer Card -->
+                <div class="footer-card">
+                    <p><strong>Rental System Admin Panel</strong></p>
+                    <p>Secure access for property management professionals</p>
+                    
+                    <div class="footer-links">
+                        <p>
+                            Looking for rentals? 
+                            <a href="register.html">Create Account</a>
+                            or
+                            <a href="login.html">Sign In</a>
+                        </p>
+                        <p style="margin-top: 0.75rem;">
+                            <a href="home.html">
+                                <i class="fas fa-arrow-left" style="margin-right: 0.25rem;"></i>
+                                Back to Main Site
+                            </a>
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Dashboard Page (existing dashboard code continues here) -->
+
         <!-- Dashboard Page -->
-        <div id="dashboardPage" class="page" style="display: none;">
+        <div id="dashboardPage" class="page dashboard-page" style="display: none;">
             <nav class="navbar">
                 <div class="navbar-content">
                     <a href="#" class="navbar-brand" onclick="showDashboard()">
-                        <i class="fas fa-home" style="margin-right: 8px;"></i>
-                        Rental System
+                        <i class="fas fa-home"></i>
+                        <span>Rental System</span>
                     </a>
+                    
+                    <!-- Mobile Menu Toggle -->
+                    <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                        <i class="fas fa-bars"></i>
+                    </button>
                     
                     <div class="navbar-actions">
                         <a href="#" onclick="showHouses()" class="nav-link">
                             <i class="fas fa-building"></i>
-                            Manage Houses
+                            <span>Houses</span>
                         </a>
                         
                         <a href="#" onclick="showBookings()" class="nav-link">
                             <i class="fas fa-calendar-check"></i>
-                            Manage Bookings
+                            <span>Bookings</span>
                         </a>
                         
                         <a href="#" onclick="showUsers()" class="nav-link">
                             <i class="fas fa-users"></i>
-                            Manage Users
+                            <span>Users</span>
                         </a>
                         
                         <button onclick="logout()" class="logout-button">
-                            <i class="fas fa-sign-out-alt" style="margin-right: 8px;"></i>
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </button>
+                    </div>
+
+                    <!-- Mobile Menu -->
+                    <div class="mobile-menu" id="mobileMenu">
+                        <a href="#" onclick="showDashboard(); closeMobileMenu()" class="nav-link">
+                            <i class="fas fa-chart-bar"></i>
+                            Dashboard
+                        </a>
+                        <a href="#" onclick="showHouses(); closeMobileMenu()" class="nav-link">
+                            <i class="fas fa-building"></i>
+                            Manage Houses
+                        </a>
+                        <a href="#" onclick="showBookings(); closeMobileMenu()" class="nav-link">
+                            <i class="fas fa-calendar-check"></i>
+                            Manage Bookings
+                        </a>
+                        <a href="#" onclick="showUsers(); closeMobileMenu()" class="nav-link">
+                            <i class="fas fa-users"></i>
+                            Manage Users
+                        </a>
+                        <button onclick="logout()" class="logout-button">
+                            <i class="fas fa-sign-out-alt"></i>
                             Logout
                         </button>
                     </div>
@@ -185,7 +712,7 @@
             <div class="dashboard-content">
                 <div class="page-header">
                     <h1 class="page-title">
-                        <i class="fas fa-chart-bar" style="margin-right: 12px;"></i>
+                        <i class="fas fa-chart-bar"></i>
                         Dashboard
                     </h1>
                     <p class="page-subtitle">
@@ -198,42 +725,57 @@
                 </div>
 
                 <div class="quick-actions-card">
-                    <h2>Quick Actions</h2>
+                    <h2>
+                        <i class="fas fa-home" style="margin-right: 0.5rem; color: var(--primary-color);"></i>
+                        Property Management
+                    </h2>
                     <p>Manage your rental properties efficiently</p>
                     <div class="action-buttons">
                         <button onclick="showAddHouseModal()" class="add-house-button">
-                            <i class="fas fa-plus" style="margin-right: 8px;"></i>
+                            <i class="fas fa-plus"></i>
                             Add New House
                         </button>
                         <button onclick="showHouses()" class="secondary-action-button">
-                            <i class="fas fa-building" style="margin-right: 8px;"></i>
+                            <i class="fas fa-building"></i>
                             View All Houses
                         </button>
                     </div>
                 </div>
 
                 <div class="quick-actions-card">
-                    <h2>User Management</h2>
+                    <h2>
+                        <i class="fas fa-users" style="margin-right: 0.5rem; color: var(--primary-color);"></i>
+                        User Management
+                    </h2>
                     <p>Monitor and manage registered users</p>
                     <div class="action-buttons">
                         <button onclick="showUsers()" class="secondary-action-button">
-                            <i class="fas fa-users" style="margin-right: 8px;"></i>
+                            <i class="fas fa-users"></i>
                             View All Users
                         </button>
                         <button onclick="loadUserStats()" class="secondary-action-button">
-                            <i class="fas fa-chart-bar" style="margin-right: 8px;"></i>
+                            <i class="fas fa-chart-bar"></i>
                             User Statistics
                         </button>
                     </div>
                 </div>
 
                 <div class="welcome-card">
-                    <h2>Welcome to Rental System Admin</h2>
+                    <h2>
+                        <i class="fas fa-star" style="margin-right: 0.5rem; color: var(--warning-color);"></i>
+                        Welcome to Rental System Admin
+                    </h2>
                     <p>
                         Your comprehensive platform for managing rental properties. 
                         Add new houses, upload images, set amenities, and track availability 
                         all in one place.
                     </p>
+                    <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-secondary); border-radius: var(--border-radius); border-left: 4px solid var(--primary-color);">
+                        <p style="margin: 0; font-weight: 500; color: var(--primary-color);">
+                            <i class="fas fa-info-circle" style="margin-right: 0.5rem;"></i>
+                            Quick Tip: Use the mobile menu (☰) to navigate on smaller screens.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -589,5 +1131,144 @@
 
     <script src="js/config.js"></script>
     <script src="js/app.js"></script>
+    
+    <script>
+        // Mobile Menu Functionality
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const menuToggle = document.querySelector('.mobile-menu-toggle');
+            
+            mobileMenu.classList.toggle('active');
+            
+            // Update toggle icon
+            const icon = menuToggle.querySelector('i');
+            if (mobileMenu.classList.contains('active')) {
+                icon.className = 'fas fa-times';
+            } else {
+                icon.className = 'fas fa-bars';
+            }
+        }
+
+        function closeMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const menuToggle = document.querySelector('.mobile-menu-toggle');
+            
+            mobileMenu.classList.remove('active');
+            
+            // Reset toggle icon
+            const icon = menuToggle.querySelector('i');
+            icon.className = 'fas fa-bars';
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const menuToggle = document.querySelector('.mobile-menu-toggle');
+            
+            if (mobileMenu && menuToggle && 
+                !mobileMenu.contains(event.target) && 
+                !menuToggle.contains(event.target) &&
+                mobileMenu.classList.contains('active')) {
+                closeMobileMenu();
+            }
+        });
+
+        // Enhanced form validation for mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            // Prevent double-tap zoom on iOS for form inputs
+            const inputs = document.querySelectorAll('input[type="email"], input[type="password"]');
+            inputs.forEach(input => {
+                input.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    this.focus();
+                });
+            });
+
+            // Enhanced error display for mobile
+            const originalShowError = window.showError || function() {};
+            window.showError = function(message) {
+                const errorDiv = document.getElementById('loginError');
+                const errorText = document.getElementById('errorText');
+                
+                if (errorDiv && errorText) {
+                    errorText.textContent = message;
+                    errorDiv.style.display = 'flex';
+                    
+                    // Auto-hide after 5 seconds on mobile
+                    if (window.innerWidth <= 768) {
+                        setTimeout(() => {
+                            errorDiv.style.display = 'none';
+                        }, 5000);
+                    }
+                    
+                    // Scroll error into view on mobile
+                    errorDiv.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'center' 
+                    });
+                } else {
+                    originalShowError(message);
+                }
+            };
+
+            // Enhanced success display for mobile
+            const originalShowSuccess = window.showSuccess || function() {};
+            window.showSuccess = function(message) {
+                const successDiv = document.getElementById('loginSuccess');
+                const successText = document.getElementById('successText');
+                
+                if (successDiv && successText) {
+                    successText.textContent = message;
+                    successDiv.style.display = 'flex';
+                    
+                    // Auto-hide after 3 seconds
+                    setTimeout(() => {
+                        successDiv.style.display = 'none';
+                    }, 3000);
+                    
+                    // Scroll success into view on mobile
+                    successDiv.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'center' 
+                    });
+                } else {
+                    originalShowSuccess(message);
+                }
+            };
+
+            // Responsive viewport height adjustment for mobile browsers
+            function setVH() {
+                let vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+            }
+
+            setVH();
+            window.addEventListener('resize', setVH);
+            window.addEventListener('orientationchange', setVH);
+
+            // Enhanced touch interactions for mobile
+            const buttons = document.querySelectorAll('.login-button, .add-house-button, .secondary-action-button');
+            buttons.forEach(button => {
+                button.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.98)';
+                });
+                
+                button.addEventListener('touchend', function() {
+                    this.style.transform = '';
+                });
+            });
+        });
+
+        // Keyboard navigation for accessibility
+        document.addEventListener('keydown', function(e) {
+            // Close mobile menu with Escape key
+            if (e.key === 'Escape') {
+                const mobileMenu = document.getElementById('mobileMenu');
+                if (mobileMenu && mobileMenu.classList.contains('active')) {
+                    closeMobileMenu();
+                }
+            }
+        });
+    </script>
 </body>
 </html>
