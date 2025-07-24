@@ -1,5 +1,8 @@
 // Registration page functionality
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize OTP container early so fallback can reference it
+    const otpContainer = document.querySelector('.otp-input-container');
+    setupOTPInputs(otpContainer);
     // Fallback: Show OTP modal if registration was successful but not verified
     if (localStorage.getItem('pendingEmailVerification')) {
         currentEmail = localStorage.getItem('pendingEmailVerification');
@@ -19,9 +22,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentEmail = '';
     let currentUserName = '';
     
-    // Setup OTP inputs
-    const otpContainer = document.querySelector('.otp-input-container');
-    setupOTPInputs(otpContainer);
     
     // Handle registration form submission
     registerForm.addEventListener('submit', async function(e) {
