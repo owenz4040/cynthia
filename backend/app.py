@@ -88,8 +88,12 @@ def create_app(config_name=None):
     
     return app
 
+# Create app instance for Gunicorn
+app = create_app()
+
 if __name__ == '__main__':
-    app = create_app()
+    # This code only runs when running with python app.py directly
+    # When using Gunicorn, only the app instance above is used
     
     # Create uploads directory if it doesn't exist
     upload_dir = app.config.get('UPLOAD_FOLDER', 'uploads/')
