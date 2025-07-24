@@ -35,8 +35,8 @@ async function testAdminAuth() {
 // Add to window for manual testing
 window.testAdminAuth = testAdminAuth;
 
-// Global variables
-const API_BASE_URL = 'http://localhost:5000/api';
+// Global variables - Use Config for API URL
+const API_BASE_URL = Config.API_BASE;
 let authToken = localStorage.getItem('adminToken');
 let currentHouse = null;
 let selectedImages = [];

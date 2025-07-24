@@ -831,3 +831,53 @@ function redirectToSignup() {
         window.location.href = 'register.html';
     }, 2000);
 }
+
+// Mobile Menu Functions
+function toggleMobileMenu() {
+    const toggle = document.querySelector('.mobile-menu-toggle');
+    const mobileMenu = document.getElementById('mobileNavMenu');
+    
+    if (toggle && mobileMenu) {
+        toggle.classList.toggle('active');
+        
+        if (mobileMenu.style.display === 'block') {
+            mobileMenu.style.display = 'none';
+        } else {
+            mobileMenu.style.display = 'block';
+        }
+    }
+}
+
+function closeMobileMenu() {
+    const toggle = document.querySelector('.mobile-menu-toggle');
+    const mobileMenu = document.getElementById('mobileNavMenu');
+    
+    if (toggle && mobileMenu) {
+        toggle.classList.remove('active');
+        mobileMenu.style.display = 'none';
+    }
+}
+
+// Close mobile menu when clicking outside
+document.addEventListener('click', function(event) {
+    const toggle = document.querySelector('.mobile-menu-toggle');
+    const mobileMenu = document.getElementById('mobileNavMenu');
+    
+    if (toggle && mobileMenu && !toggle.contains(event.target) && !mobileMenu.contains(event.target)) {
+        toggle.classList.remove('active');
+        mobileMenu.style.display = 'none';
+    }
+});
+
+// Close mobile menu on window resize
+window.addEventListener('resize', function() {
+    if (window.innerWidth > 768) {
+        const toggle = document.querySelector('.mobile-menu-toggle');
+        const mobileMenu = document.getElementById('mobileNavMenu');
+        
+        if (toggle && mobileMenu) {
+            toggle.classList.remove('active');
+            mobileMenu.style.display = 'none';
+        }
+    }
+});
