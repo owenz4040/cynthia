@@ -64,9 +64,15 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Handle email verification required
             if (error.message.includes('Email not verified') || error.message.includes('requires_verification')) {
+                // Prepare quick verification modal
                 pendingEmail = data.email;
                 document.getElementById('userEmailForResend').value = pendingEmail;
                 showModal('verificationRequiredModal');
+                // Reveal OTP input immediately
+                const quickForm = document.querySelector('#verificationRequiredModal .verification-form');
+                if (quickForm) quickForm.style.display = 'block';
+                const otpField = document.getElementById('quickOtpInput');
+                if (otpField) otpField.focus();
                 showNotification('Please verify your email address first.', 'warning');
             } else {
                 showNotification(error.message || 'Login failed. Please check your credentials.', 'error');
