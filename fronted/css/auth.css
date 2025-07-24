@@ -41,11 +41,25 @@
     justify-content: center;
     gap: 10px;
     margin-bottom: 20px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+}
+
+.logo:hover {
+    transform: translateY(-2px);
+    text-decoration: none;
+    color: inherit;
 }
 
 .logo i {
     font-size: 2rem;
     color: #667eea;
+    transition: color 0.3s ease;
+}
+
+.logo:hover i {
+    color: #5a6fd8;
 }
 
 .logo h1 {

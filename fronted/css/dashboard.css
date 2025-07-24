@@ -41,10 +41,23 @@ body {
     font-size: 1.3rem;
     font-weight: 700;
     color: #667eea;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.nav-brand:hover {
+    color: #5a6fd8;
+    text-decoration: none;
+    transform: translateY(-1px);
 }
 
 .nav-brand i {
     font-size: 1.5rem;
+    transition: transform 0.3s ease;
+}
+
+.nav-brand:hover i {
+    transform: scale(1.1);
 }
 
 .nav-menu {
