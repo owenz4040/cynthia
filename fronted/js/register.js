@@ -1,15 +1,5 @@
 // Registration page functionality
 document.addEventListener('DOMContentLoaded', function() {
-    // (Using single-field OTP input with id 'otpInput')
-    // Fallback: Show OTP modal if registration was successful but not verified
-    if (localStorage.getItem('pendingEmailVerification')) {
-        currentEmail = localStorage.getItem('pendingEmailVerification');
-        document.getElementById('userEmail').textContent = currentEmail;
-        showModal('verificationModal');
-        // Focus the single OTP input
-        const otpField = document.getElementById('otpInput');
-        if (otpField) otpField.focus();
-    }
     const registerForm = document.getElementById('registerForm');
     const verificationModal = document.getElementById('verificationModal');
     const verificationForm = document.getElementById('verificationForm');
@@ -45,22 +35,14 @@ document.addEventListener('DOMContentLoaded', function() {
             if (response.ok && result.otp_sent) {
                 currentEmail = data.email;
                 currentUserName = data.name;
-                // Store pending verification in localStorage for fallback
+                // Store pending verification
                 localStorage.setItem('pendingEmailVerification', currentEmail);
-                // Redirect to OTP verification page
-                showNotification(`🎉 Registration successful! Redirecting to verification page...`, 'success', 5000);
+                // Notify and redirect to OTP page
+                showNotification(`🎉 Registration successful! Redirecting to email verification...`, 'success', 3000);
                 setTimeout(() => {
-                    window.location.href = 'otp.html';
-                }, 2000);
-
-                // Success notification
-                showNotification(`🎉 Registration successful! Welcome ${currentUserName}! Please check your email (${currentEmail}) for the 6-digit verification code.`, 'success', 8000);
-                // Log successful registration for debugging
-                console.log('✅ User registered successfully:', {
-                    email: currentEmail,
-                    name: currentUserName,
-                    timestamp: new Date().toISOString()
-                });
+                    window.location.href = `${Config.FRONTEND_URL}/otp.html`;
+                }, 1000);
+                console.log('✅ User registered:', { email: currentEmail, name: currentUserName });
             } else {
                 // Show error if OTP not sent
                 let errorMsg = result.error || 'Registration failed. Could not send verification email.';
