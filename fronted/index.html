@@ -3,17 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cynthia - Rental Property Management</title>
-    <script>
-        // Redirect to home.html immediately
-        window.location.replace('home.html');
-    </script>
+    <title>Admin Login - Rental Property Management</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <p>Redirecting to Cynthia Rental System...</p>
-    <p>If you are not redirected automatically, <a href="home.html">click here</a>.</p>
-</body>
-</html>
+    <div class="app-container">
+        <!-- Admin Login Page -->
+        <div id="loginPage" class="page active">
+            <div class="auth-container">
+                <!-- Instagram-style design -->
+                <div class="auth-content">
+                    <!-- Phone mockup side -->
+                    <div class="phone-mockup">
+                        <div class="phone-frame">
+                            <div class="phone-screen">
+                                <div class="app-preview">
+                                    <i class="fas fa-home" style="font-size: 48px; color: #fff; opacity: 0.3;"></i>
+                                    <p style="color: #fff; opacity: 0.8; margin-top: 20px;">Rental System Admin</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Login Form -->
+                    <div class="login-form-container">
+                        <div class="login-card">
+                            <div class="logo">
+                                <i class="fas fa-home gradient-icon"></i>
+                                <h1>Rental System</h1>
+                            </div>
+
+                            <div id="loginError" class="error-message" style="display: none;"></div>
+
+                            <form id="loginForm">
+                                <div class="form-group">
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        name="email"
+                                        placeholder="Email address"
+                                        class="form-input"
+                                        required
+                                    />
+                                </div>
+
+                                <div class="form-group">
+                                    <input
+                                        type="password"
+                                        id="password"
+                                        name="password"
+                                        placeholder="Password"
+                                        class="form-input"
+                                        required
+                                    />
+                                </div>
+
+                                <button type="submit" class="login-button" id="loginBtn">
+                                    <span id="loginBtnText">Sign in</span>
+                                    <div id="loginSpinner" class="loading-spinner" style="display: none;"></div>
+                                </button>
+                            </form>
+
+                            <div class="divider">
+                                <span>OR</span>
+                            </div>
+
+                            <div style="text-align: center; color: #8e8e8e; font-size: 12px;">
+                                <p>Admin access only</p>
+                                <p style="margin-top: 8px;">
+                                    <i class="fas fa-user" style="margin-right: 4px;"></i>
+                                    Manage rental properties
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="footer-card">
+                            <p>Rental System Admin Panel</p>
+                            <p style="margin-top: 8px; font-size: 12px;">
+                                Secure access for property management
+                            </p>
+                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #dbdbdb;">
+                                <p style="font-size: 12px; color: #8e8e8e;">
+                                    Looking for rentals? 
+                                    <a href="register.html" style="color: #0095f6; text-decoration: none; font-weight: 500;">
+                                        Create Account
+                                    </a>
+                                    or
+                                    <a href="login.html" style="color: #0095f6; text-decoration: none; font-weight: 500;">
+                                        Sign In
+                                    </a>
+                                </p>
+                                <p style="font-size: 12px; color: #8e8e8e; margin-top: 8px;">
+                                    Want to browse properties? 
+                                    <a href="home.html" style="color: #0095f6; text-decoration: none; font-weight: 500;">
+                                        <i class="fas fa-home" style="margin-right: 4px;"></i>
+                                        View Properties
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
                                     <i class="fas fa-home" style="font-size: 48px; color: #fff; opacity: 0.3;"></i>
                                     <p style="color: #fff; opacity: 0.8; margin-top: 20px;">Rental System Admin</p>
                                 </div>
