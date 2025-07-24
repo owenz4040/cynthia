@@ -193,7 +193,7 @@ def login_user():
         # Check if email is verified
         if not user.get('is_verified', False):
             return jsonify({
-                'error': 'Email not verified. Please verify your email first.',
+                'error': 'Your email is not verified. Please check your inbox for the OTP and verify your account before logging in.',
                 'requires_verification': True
             }), 401
         
