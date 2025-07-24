@@ -5,7 +5,7 @@ Email utilities for sending OTP and other notifications.
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from flask import current_app
+from flask import current_app, url_for
 import os
 
 def send_otp_email(to_email, otp_code, user_name="User"):
@@ -65,7 +65,7 @@ def send_otp_email(to_email, otp_code, user_name="User"):
                         <p><small>This code expires in 10 minutes</small></p>
                     </div>
                     <p style="text-align:center; margin:20px 0;">
-                        <a href="{current_app.url_root}api/verify-email/{to_email}/{otp_code}" class="button">Verify Email Now</a>
+                        <a href="{url_for('api.verify_email_link', email=to_email, otp_code=otp_code, _external=True)}" class="button">Verify Email Now</a>
                     </p>
                     
                     <p>Enter this code on the verification page to activate your account and start browsing amazing rental properties!</p>
@@ -127,9 +127,6 @@ def send_otp_email(to_email, otp_code, user_name="User"):
     except Exception as e:
         print(f"❌ Failed to send OTP email: {str(e)}")
         print(f"❌ Error type: {type(e).__name__}")
-        return False
-
-def send_welcome_email(to_email, user_name):
     """Send welcome email after successful verification."""
     try:
         smtp_server = current_app.config.get('SMTP_SERVER', 'smtp.gmail.com')
