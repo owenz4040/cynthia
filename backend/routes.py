@@ -143,6 +143,37 @@ def verify_email():
     except Exception as e:
         return jsonify({'error': f'Verification failed: {str(e)}'}), 500
 
+@api.route('/verify-email/<email>/<otp_code>', methods=['GET'])
+def verify_email_link(email, otp_code):
+    """Verify user email via link click."""
+    try:
+        # Verify OTP
+        is_valid = OTPModel.verify_otp(email, otp_code)
+        if not is_valid:
+            return ("<h1>Invalid or expired verification link.</h1>"), 400
+        # Mark user as verified
+        user = UserModel.find_by_email(email)
+        if user:
+            UserModel.verify_user(str(user['_id']))
+            # Send welcome email
+            send_welcome_email(email, user['name'])
+        # Clean up OTPs
+        OTPModel.cleanup_expired_otps()
+        # Show confirmation HTML
+        return ("""
+        <!DOCTYPE html>
+        <html>
+        <head><title>Email Verified</title></head>
+        <body style=\"font-family:Arial,sans-serif;text-align:center;padding:50px;\">
+            <h1>✅ Email Verified!</h1>
+            <p>Your email has been successfully verified.</p>
+            <p><a href=\"/login.html\" style=\"display:inline-block;margin-top:20px;padding:10px 20px;background:#28a745;color:#fff;text-decoration:none;border-radius:5px;\">Go to Login</a></p>
+        </body>
+        </html>
+        """), 200
+    except Exception as e:
+        return (f"<h1>Verification error: {str(e)}</h1>"), 500
+
 @api.route('/resend-otp', methods=['POST'])
 def resend_otp():
     """Resend OTP for email verification."""

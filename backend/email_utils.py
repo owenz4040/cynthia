@@ -64,6 +64,9 @@ def send_otp_email(to_email, otp_code, user_name="User"):
                         <div class="otp-code">{otp_code}</div>
                         <p><small>This code expires in 10 minutes</small></p>
                     </div>
+                    <p style="text-align:center; margin:20px 0;">
+                        <a href="{current_app.url_root}api/verify-email/{to_email}/{otp_code}" class="button">Verify Email Now</a>
+                    </p>
                     
                     <p>Enter this code on the verification page to activate your account and start browsing amazing rental properties!</p>
                     
