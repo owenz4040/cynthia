@@ -47,12 +47,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 currentUserName = data.name;
                 // Store pending verification in localStorage for fallback
                 localStorage.setItem('pendingEmailVerification', currentEmail);
-                // Update verification modal with user email
-                document.getElementById('userEmail').textContent = currentEmail;
-                // Automatically show verification modal and focus OTP input
-                showModal('verificationModal');
-                const otpField = document.getElementById('otpInput');
-                if (otpField) otpField.focus();
+                // Redirect to OTP verification page
+                showNotification(`🎉 Registration successful! Redirecting to verification page...`, 'success', 5000);
+                setTimeout(() => {
+                    window.location.href = 'otp.html';
+                }, 2000);
 
                 // Success notification
                 showNotification(`🎉 Registration successful! Welcome ${currentUserName}! Please check your email (${currentEmail}) for the 6-digit verification code.`, 'success', 8000);
