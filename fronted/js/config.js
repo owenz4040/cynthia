@@ -10,8 +10,8 @@ const Config = {
         if (this.isDevelopment) {
             return 'http://localhost:5000/api';
         } else {
-            // In production, replace this with your actual Render backend URL
-            return 'https://your-backend-app-name.onrender.com/api';
+            // In production, using your actual Render backend URL
+            return 'https://cynthia-api.onrender.com/api';
         }
     },
     
@@ -20,8 +20,8 @@ const Config = {
         if (this.isDevelopment) {
             return 'http://localhost:8000';
         } else {
-            // In production, replace this with your actual Render frontend URL
-            return 'https://your-frontend-app-name.onrender.com';
+            // In production, using your actual Render frontend URL
+            return 'https://cynthia-frontend.onrender.com';
         }
     },
     
