@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, session
+from flask import Blueprint, request, jsonify, session, url_for
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from models import AdminModel, HouseModel, UserModel, OTPModel, BookingModel, mongo
 from auth import admin_required, validate_admin_credentials, validate_required_fields
@@ -88,18 +88,26 @@ def register_user():
             profile_image=profile_image_url
         )
         
-        # Generate and send OTP
+        # Generate OTP and create verification link
         otp_code = OTPModel.create_otp(data['email'])
+        verification_link = url_for('api.verify_email_link', email=data['email'], otp_code=otp_code, _external=True)
+        # Send OTP email (with link)
         email_sent = send_otp_email(data['email'], otp_code, data['name'])
+        # Respond with link regardless of email success
         if not email_sent:
             return jsonify({
-                'error': 'Failed to send verification email. Please check your email address and try again. If the problem persists, contact support.'
-            }), 500
+                'message': 'Registration successful, but email delivery failed.',
+                'user_id': user_id,
+                'email': data['email'],
+                'otp_sent': False,
+                'verification_link': verification_link
+            }), 201
         return jsonify({
-            'message': 'Registration successful! Please check your email for the verification code.',
+            'message': 'Registration successful! Verification email sent.',
             'user_id': user_id,
             'email': data['email'],
-            'otp_sent': True
+            'otp_sent': True,
+            'verification_link': verification_link
         }), 201
         
     except Exception as e:

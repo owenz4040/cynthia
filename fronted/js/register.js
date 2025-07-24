@@ -25,29 +25,32 @@ document.addEventListener('DOMContentLoaded', function() {
         showLoading('registerBtn', 'Creating Account...');
         
         try {
-            const response = await fetch(`${AuthUtils.API_BASE_URL}/register`, {
+            const response = await fetch(`${Config.API_BASE}/register`, {
                 method: 'POST',
                 body: formData  // Send FormData directly for file upload
             });
             
             const result = await response.json();
             
-            if (response.ok && result.otp_sent) {
+            if (response.ok) {
                 currentEmail = data.email;
                 currentUserName = data.name;
                 // Store pending verification
                 localStorage.setItem('pendingEmailVerification', currentEmail);
-                // Notify and redirect to OTP page
-                showNotification(`🎉 Registration successful! Redirecting to email verification...`, 'success', 3000);
-                setTimeout(() => {
-                    window.location.href = `${Config.FRONTEND_URL}/otp.html`;
-                }, 1000);
+                // If backend provided a verification link, open it directly
+                if (result.verification_link) {
+                    showNotification('🎉 Registration successful! Opening verification link...', 'success', 3000);
+                    window.location.href = result.verification_link;
+                    return;
+                }
+                // Fallback: inform user to check email for code link
+                showNotification('🎉 Registration successful! Please check your email and click the verification link.', 'success', 8000);
                 console.log('✅ User registered:', { email: currentEmail, name: currentUserName });
             } else {
-                // Show error if OTP not sent
-                let errorMsg = result.error || 'Registration failed. Could not send verification email.';
-                showNotification(`❌ ${errorMsg}`, 'error', 8000);
-                throw new Error(errorMsg);
+                // Show error message
+                let msg = result.error || 'Registration failed. Please try again.';
+                showNotification(`❌ ${msg}`, 'error', 8000);
+                throw new Error(msg);
             }
             
         } catch (error) {
