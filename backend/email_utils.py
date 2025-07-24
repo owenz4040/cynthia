@@ -127,6 +127,9 @@ def send_otp_email(to_email, otp_code, user_name="User"):
     except Exception as e:
         print(f"❌ Failed to send OTP email: {str(e)}")
         print(f"❌ Error type: {type(e).__name__}")
+        return False
+
+def send_welcome_email(to_email, user_name):
     """Send welcome email after successful verification."""
     try:
         smtp_server = current_app.config.get('SMTP_SERVER', 'smtp.gmail.com')
