@@ -107,8 +107,10 @@ if __name__ == '__main__':
     print(f"Cloudinary: {app.config.get('CLOUDINARY_CLOUD_NAME')}")
     print("="*50)
     
+    # Use PORT environment variable for deployment platforms like Render
+    port = int(os.environ.get('PORT', 5000))
     app.run(
         host='0.0.0.0',
-        port=5000,
+        port=port,
         debug=app.config.get('DEBUG', False)
     )
