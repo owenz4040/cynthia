@@ -1,7 +1,7 @@
 // Authentication utility functions
 class AuthUtils {
     static get API_BASE() {
-        return window.Config ? window.Config.API_BASE : 'http://localhost:5000/api';
+        return window.Config ? window.Config.API_BASE : 'https://cynthia-api.onrender.com/api';
     }
     
     // Token management
@@ -88,6 +88,8 @@ class AuthUtils {
         const url = `${this.API_BASE}${endpoint}`;
         const token = this.getToken();
         
+        console.log('Making API request:', { url, hasToken: !!token, endpoint });
+        
         const defaultOptions = {
             headers: {
                 'Content-Type': 'application/json',
@@ -107,6 +109,8 @@ class AuthUtils {
         try {
             const response = await fetch(url, finalOptions);
             
+            console.log('API response:', { status: response.status, ok: response.ok, url });
+            
             // Handle token expiration or unauthorized access
             if (response.status === 401) {
                 console.warn('Token expired or unauthorized. Redirecting to login...');
@@ -117,12 +121,13 @@ class AuthUtils {
             const data = await response.json();
             
             if (!response.ok) {
+                console.error('API error:', data);
                 throw new Error(data.error || `HTTP error! status: ${response.status}`);
             }
             
             return data;
         } catch (error) {
-            console.error('API Request failed:', error);
+            console.error('API Request failed:', { error, url, options });
             throw error;
         }
     }

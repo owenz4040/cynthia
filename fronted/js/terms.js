@@ -47,9 +47,18 @@ document.addEventListener('DOMContentLoaded', function() {
         
         showLoading('acceptBtn', 'Processing...');
         
+        console.log('Attempting to accept terms...', {
+            apiBase: AuthUtils.API_BASE,
+            hasToken: !!AuthUtils.getToken(),
+            user: AuthUtils.getUserData()
+        });
+        
         try {
             const response = await AuthUtils.apiRequest('/accept-terms', {
-                method: 'POST'
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             });
             
             // Update local user data

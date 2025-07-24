@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Debug Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        button { margin: 5px; padding: 10px; }
+        #results { white-space: pre-wrap; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>API Debug Test</h1>
+    
+    <div class="test-section">
+        <h3>API Configuration</h3>
+        <p id="api-config"></p>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test 1: Health Check</h3>
+        <button onclick="testHealth()">Test Health Endpoint</button>
+        <div id="health-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test 2: Authentication Check</h3>
+        <button onclick="testAuth()">Test Auth Endpoint</button>
+        <div id="auth-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test 3: Accept Terms</h3>
+        <button onclick="testAcceptTerms()">Test Accept Terms</button>
+        <div id="terms-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Debug Output</h3>
+        <button onclick="clearResults()">Clear Results</button>
+        <div id="results"></div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        // Display current API configuration
+        document.getElementById('api-config').innerHTML = `
+            <strong>Environment:</strong> ${Config.getEnvironment()}<br>
+            <strong>API Base URL:</strong> ${Config.getApiUrl()}<br>
+            <strong>Current Token:</strong> ${AuthUtils.getToken() ? 'Present' : 'Not found'}
+        `;
+
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'error' : (type === 'success' ? 'success' : 'info');
+            results.innerHTML += `<span class="${className}">[${timestamp}] ${message}</span>\n`;
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        async function testHealth() {
+            const resultDiv = document.getElementById('health-result');
+            log('Testing health endpoint...');
+            
+            try {
+                const response = await fetch(`${Config.getApiUrl()}/health`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `<span class="success">✅ Health check passed: ${JSON.stringify(data)}</span>`;
+                    log(`Health check successful: ${JSON.stringify(data)}`, 'success');
+                } else {
+                    resultDiv.innerHTML = `<span class="error">❌ Health check failed: ${response.status}</span>`;
+                    log(`Health check failed: ${response.status} - ${JSON.stringify(data)}`, 'error');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ Health check error: ${error.message}</span>`;
+                log(`Health check error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAuth() {
+            const resultDiv = document.getElementById('auth-result');
+            log('Testing auth endpoint...');
+            
+            try {
+                const data = await AuthUtils.apiRequest('/test-auth');
+                resultDiv.innerHTML = `<span class="success">✅ Auth test passed: ${JSON.stringify(data)}</span>`;
+                log(`Auth test successful: ${JSON.stringify(data)}`, 'success');
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ Auth test failed: ${error.message}</span>`;
+                log(`Auth test error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAcceptTerms() {
+            const resultDiv = document.getElementById('terms-result');
+            log('Testing accept terms endpoint...');
+            
+            try {
+                const data = await AuthUtils.apiRequest('/accept-terms', {
+                    method: 'POST'
+                });
+                resultDiv.innerHTML = `<span class="success">✅ Accept terms passed: ${JSON.stringify(data)}</span>`;
+                log(`Accept terms successful: ${JSON.stringify(data)}`, 'success');
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ Accept terms failed: ${error.message}</span>`;
+                log(`Accept terms error: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-run health check on page load
+        window.onload = function() {
+            log('Page loaded, running initial health check...');
+            testHealth();
+        };
+    </script>
+</body>
+</html>

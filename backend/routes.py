@@ -24,6 +24,20 @@ def handle_options(path=None):
     response.headers.add('Access-Control-Allow-Credentials', 'true')
     return response
 
+# Health check endpoint
+@api.route('/health', methods=['GET'])
+def health_check():
+    """Simple health check endpoint."""
+    return jsonify({'status': 'ok', 'message': 'API is running'}), 200
+
+# Test endpoint for authenticated requests
+@api.route('/test-auth', methods=['GET'])
+@jwt_required()
+def test_auth():
+    """Test endpoint for checking authentication."""
+    user_id = get_jwt_identity()
+    return jsonify({'status': 'ok', 'user_id': user_id, 'message': 'Authentication working'}), 200
+
 # User Registration and Authentication Routes
 
 @api.route('/register', methods=['POST'])
