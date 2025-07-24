@@ -47,6 +47,9 @@
                         <a href="#" class="dropdown-item" data-section="settings">
                             <i class="fas fa-cog"></i> Settings
                         </a>
+                        <a href="terms.html" class="dropdown-item" target="_blank">
+                            <i class="fas fa-file-alt"></i> Terms & Conditions
+                        </a>
                         <a href="site-visit-terms.html" class="dropdown-item" target="_blank">
                             <i class="fas fa-file-contract"></i> Site Visit Terms
                         </a>
@@ -302,6 +305,33 @@
                 </div>
             </div>
         </section>
+
+        <!-- My Bookings Section -->
+        <section id="bookings-section" class="content-section">
+            <div class="page-header">
+                <h1><i class="fas fa-calendar-check"></i> My Bookings</h1>
+                <p>Track your site review appointments</p>
+            </div>
+            
+            <div class="bookings-filters">
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-status="all">All Bookings</button>
+                    <button class="filter-tab" data-status="pending">Pending</button>
+                    <button class="filter-tab" data-status="approved">Approved</button>
+                    <button class="filter-tab" data-status="completed">Completed</button>
+                    <button class="filter-tab" data-status="rejected">Rejected</button>
+                    <button class="filter-tab" data-status="cancelled">Cancelled</button>
+                </div>
+            </div>
+            
+            <div class="bookings-grid" id="bookingsGrid">
+                <!-- Bookings will be loaded here -->
+            </div>
+            
+            <div class="pagination" id="bookingsPagination">
+                <!-- Pagination will be added here -->
+            </div>
+        </section>
     </main>
 
     <!-- Property Details Modal -->
@@ -406,33 +436,6 @@
             </div>
         </div>
     </div>
-
-    <!-- My Bookings Section (to be added to main content) -->
-    <section id="bookings-section" class="content-section" style="display: none;">
-        <div class="page-header">
-            <h1><i class="fas fa-calendar-check"></i> My Bookings</h1>
-            <p>Track your site review appointments</p>
-        </div>
-        
-        <div class="bookings-filters">
-            <div class="filter-tabs">
-                <button class="filter-tab active" data-status="all">All Bookings</button>
-                <button class="filter-tab" data-status="pending">Pending</button>
-                <button class="filter-tab" data-status="approved">Approved</button>
-                <button class="filter-tab" data-status="completed">Completed</button>
-                <button class="filter-tab" data-status="rejected">Rejected</button>
-                <button class="filter-tab" data-status="cancelled">Cancelled</button>
-            </div>
-        </div>
-        
-        <div class="bookings-grid" id="bookingsGrid">
-            <!-- Bookings will be loaded here -->
-        </div>
-        
-        <div class="pagination" id="bookingsPagination">
-            <!-- Pagination will be added here -->
-        </div>
-    </section>
 
     <script src="js/config.js"></script>
     <script src="js/auth.js"></script>
