@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from config import config
@@ -21,8 +21,19 @@ def create_app(config_name=None):
     CORS(app, 
          origins=app.config['CORS_ORIGINS'],
          methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-         allow_headers=['Content-Type', 'Authorization', 'Access-Control-Allow-Credentials'],
-         supports_credentials=True)
+         allow_headers=[
+             'Content-Type', 
+             'Authorization', 
+             'Access-Control-Allow-Credentials',
+             'Access-Control-Allow-Origin',
+             'Access-Control-Allow-Methods',
+             'Access-Control-Allow-Headers',
+             'X-Requested-With',
+             'Accept'
+         ],
+         supports_credentials=True,
+         send_wildcard=False,
+         vary_header=True)
     jwt = JWTManager(app)
     
     # Configure Cloudinary
@@ -31,6 +42,23 @@ def create_app(config_name=None):
     
     # Register blueprints
     app.register_blueprint(api)
+    
+    # Add CORS headers to all responses
+    @app.after_request
+    def after_request(response):
+        origin = request.headers.get('Origin')
+        if origin in app.config['CORS_ORIGINS']:
+            response.headers.add('Access-Control-Allow-Origin', origin)
+        else:
+            response.headers.add('Access-Control-Allow-Origin', '*')
+        
+        response.headers.add('Access-Control-Allow-Headers', 
+                           'Content-Type,Authorization,X-Requested-With,Accept')
+        response.headers.add('Access-Control-Allow-Methods', 
+                           'GET,POST,PUT,DELETE,OPTIONS')
+        response.headers.add('Access-Control-Allow-Credentials', 'true')
+        response.headers.add('Access-Control-Max-Age', '3600')
+        return response
     
     # Create default admin within app context
     with app.app_context():

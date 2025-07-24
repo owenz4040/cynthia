@@ -11,6 +11,19 @@ from datetime import datetime
 
 api = Blueprint('api', __name__, url_prefix='/api')
 
+# Global OPTIONS handler for CORS preflight requests
+@api.route('/', methods=['OPTIONS'])
+@api.route('/<path:path>', methods=['OPTIONS'])
+def handle_options(path=None):
+    """Handle CORS preflight requests for all API endpoints."""
+    from flask import make_response
+    response = make_response()
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With,Accept')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    return response
+
 # User Registration and Authentication Routes
 
 @api.route('/register', methods=['POST'])
