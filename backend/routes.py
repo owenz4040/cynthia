@@ -502,12 +502,13 @@ def get_houses_public():
         # Get only available houses for public viewing
         houses, total = HouseModel.find_all(page=page, per_page=per_page)
         
-        # Filter only available houses
-        available_houses = [house for house in houses if house.get('is_available', True)]
-        
-        # Convert ObjectId to string for JSON serialization
-        for house in available_houses:
-            house['_id'] = str(house['_id'])
+        # Filter only available houses and convert to dict format
+        available_houses = []
+        for house in houses:
+            if house.get('is_available', True):
+                house_dict = HouseModel.to_dict(house)
+                if house_dict:  # Only add if conversion successful
+                    available_houses.append(house_dict)
         
         return jsonify({
             'houses': available_houses,
