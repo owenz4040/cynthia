@@ -116,7 +116,7 @@ The API will be available at `http://localhost:5000`
 - id, email, password_hash, created_at, updated_at
 
 ### House
-- id, name, description, bedrooms, bathrooms, price_per_night, location, amenities, is_available, created_at, updated_at
+- id, name, description, bedrooms, bathrooms, price_per_month, location, amenities, is_available, created_at, updated_at
 
 ### HouseImage
 - id, house_id, image_url, public_id, is_primary, created_at

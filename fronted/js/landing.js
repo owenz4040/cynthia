@@ -514,7 +514,7 @@ function showDemoProperties() {
             _id: 'demo1',
             name: 'Modern Downtown Apartment',
             location: 'Westlands, Nairobi',
-            price_per_night: 150, // KSh 150 per night = KSh 4,500/month
+            price_per_month: 4500, // KSh 4,500/month
             bedrooms: 2,
             bathrooms: 1,
             images: []
@@ -523,7 +523,7 @@ function showDemoProperties() {
             _id: 'demo2',
             name: 'Luxury Garden Villa',
             location: 'Karen, Nairobi',
-            price_per_night: 500, // KSh 500 per night = KSh 15,000/month
+            price_per_month: 15000, // KSh 15,000/month
             bedrooms: 4,
             bathrooms: 3,
             images: []
@@ -532,7 +532,7 @@ function showDemoProperties() {
             _id: 'demo3',
             name: 'Cozy Studio Apartment',
             location: 'Kilimani, Nairobi',
-            price_per_night: 100, // KSh 100 per night = KSh 3,000/month
+            price_per_month: 3000, // KSh 3,000/month
             bedrooms: 1,
             bathrooms: 1,
             images: []
@@ -541,7 +541,7 @@ function showDemoProperties() {
             _id: 'demo4',
             name: 'Executive Penthouse',
             location: 'Upperhill, Nairobi',
-            price_per_night: 800, // KSh 800 per night = KSh 24,000/month
+            price_per_month: 24000, // KSh 24,000/month
             bedrooms: 3,
             bathrooms: 2,
             images: []
@@ -586,7 +586,7 @@ function renderCarousel() {
                              <i class="fas fa-home"></i>
                          </div>`
                     }
-                    <div class="property-price">KSh ${(property.price_per_night * 30).toLocaleString()}/month</div>
+                    <div class="property-price">KSh ${property.price_per_month.toLocaleString()}/month</div>
                 </div>
                 <div class="property-info-demo">
                     <h4>${property.name || 'Beautiful Property'}</h4>

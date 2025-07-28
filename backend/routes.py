@@ -629,7 +629,7 @@ def create_house(current_admin):
         data = request.form.to_dict()
         
         # Validate required fields
-        required_fields = ['name', 'bedrooms', 'price_per_night']
+        required_fields = ['name', 'bedrooms', 'price_per_month']
         is_valid, error_message = validate_required_fields(data, required_fields)
         if not is_valid:
             return jsonify({'error': error_message}), 400
@@ -647,7 +647,7 @@ def create_house(current_admin):
             'description': data.get('description', ''),
             'bedrooms': int(data['bedrooms']),
             'bathrooms': int(data.get('bathrooms', 1)),
-            'price_per_night': float(data['price_per_night']),
+            'price_per_month': float(data['price_per_month']),
             'location': data.get('location', ''),
             'amenities': amenities_list,
             'is_available': data.get('is_available', 'true').lower() == 'true'
@@ -1011,7 +1011,7 @@ def get_user_bookings():
                 'id': str(booking['house']['_id']),
                 'name': booking['house']['name'],
                 'location': booking['house']['location'],
-                'price_per_night': booking['house']['price_per_night'],
+                'price_per_month': booking['house']['price_per_month'],
                 'images': booking['house'].get('images', [])
             }
             formatted_bookings.append(booking_dict)
@@ -1111,7 +1111,7 @@ def get_all_bookings(current_admin):
                 'id': str(booking['house']['_id']),
                 'name': booking['house']['name'],
                 'location': booking['house']['location'],
-                'price_per_night': booking['house']['price_per_night'],
+                'price_per_month': booking['house']['price_per_month'],
                 'images': booking['house'].get('images', [])
             }
             booking_dict['user'] = {

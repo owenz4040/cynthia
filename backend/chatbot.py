@@ -127,7 +127,7 @@ class RentalSystemChatbot:
                     r"\b(how much|payment|charges)\b"
                 ],
                 "responses": [
-                    "Property prices vary by location, size, and amenities. Prices are shown per night, and monthly rates are calculated automatically. All prices are in KSh (Kenyan Shillings). Check individual property listings for specific pricing."
+                    "Property prices vary by location, size, and amenities. All prices are shown per month in KSh (Kenyan Shillings). Check individual property listings for specific pricing."
                 ]
             },
             
@@ -279,10 +279,9 @@ class RentalSystemChatbot:
             if sample_properties:
                 response += "Here are some current property prices:\n\n"
                 for prop in sample_properties:
-                    monthly_price = prop.get('price_per_night', 0) * 30
                     response += f"🏠 **{prop.get('name', 'Property')}**\n"
                     response += f"📍 {prop.get('location', 'Location')}\n"
-                    response += f"💳 KSh {prop.get('price_per_night', 0):,}/night (KSh {monthly_price:,}/month)\n"
+                    response += f"💳 KSh {prop.get('price_per_month', 0):,}/month\n"
                     response += f"🛏️ {prop.get('bedrooms', 0)} bed(s), 🚿 {prop.get('bathrooms', 0)} bath(s)\n\n"
             else:
                 response += "Sample pricing ranges:\n"
@@ -365,9 +364,9 @@ class RentalSystemChatbot:
             price_stats = list(mongo.db.houses.aggregate([
                 {"$group": {
                     "_id": None,
-                    "min_price": {"$min": "$price_per_night"},
-                    "max_price": {"$max": "$price_per_night"},
-                    "avg_price": {"$avg": "$price_per_night"}
+                    "min_price": {"$min": "$price_per_month"},
+                    "max_price": {"$max": "$price_per_month"},
+                    "avg_price": {"$avg": "$price_per_month"}
                 }}
             ]))
             
@@ -379,9 +378,9 @@ class RentalSystemChatbot:
             if price_stats:
                 stats = price_stats[0]
                 response += f"\n💰 **Pricing:**\n"
-                response += f"• Lowest: KSh {stats.get('min_price', 0):,.0f}/night\n"
-                response += f"• Highest: KSh {stats.get('max_price', 0):,.0f}/night\n"
-                response += f"• Average: KSh {stats.get('avg_price', 0):,.0f}/night\n"
+                response += f"• Lowest: KSh {stats.get('min_price', 0):,.0f}/month\n"
+                response += f"• Highest: KSh {stats.get('max_price', 0):,.0f}/month\n"
+                response += f"• Average: KSh {stats.get('avg_price', 0):,.0f}/month\n"
             
             return {
                 "response": response,

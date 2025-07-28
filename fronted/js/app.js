@@ -411,7 +411,7 @@ function renderHouses(houses) {
                 
                 <div class="house-price">
                     <i class="fas fa-money-bill"></i>
-                    KSh ${(house.price_per_night * 30).toLocaleString()}/month
+                    KSh ${house.price_per_month.toLocaleString()}/month
                 </div>
                 
                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
@@ -462,8 +462,8 @@ function editHouse(houseId) {
     document.getElementById('houseDescription').value = house.description || '';
     document.getElementById('houseBedrooms').value = house.bedrooms;
     document.getElementById('houseBathrooms').value = house.bathrooms;
-    // Convert daily price back to monthly rent for display
-    document.getElementById('housePrice').value = Math.round(house.price_per_night * 30);
+    // Display current monthly price
+    document.getElementById('housePrice').value = house.price_per_month;
     document.getElementById('houseLocation').value = house.location || '';
     document.getElementById('houseAmenities').value = house.amenities ? house.amenities.join(', ') : '';
     document.getElementById('houseAvailable').checked = house.is_available;
@@ -544,10 +544,9 @@ async function handleHouseSubmit(e) {
         formData.append('bedrooms', document.getElementById('houseBedrooms').value);
         formData.append('bathrooms', document.getElementById('houseBathrooms').value);
         
-        // Convert monthly rent to daily price for backend storage
-        const monthlyRent = parseFloat(document.getElementById('housePrice').value);
-        const dailyPrice = monthlyRent / 30;
-        formData.append('price_per_night', dailyPrice.toFixed(2));
+        // Use monthly price directly for backend storage
+        const monthlyPrice = parseFloat(document.getElementById('housePrice').value);
+        formData.append('price_per_month', monthlyPrice.toFixed(2));
         
         formData.append('location', document.getElementById('houseLocation').value);
         formData.append('amenities', document.getElementById('houseAmenities').value);
@@ -1185,7 +1184,7 @@ function renderBookings(bookings) {
                 <div class="property-info">
                     <h5>${booking.house.name}</h5>
                     <p><i class="fas fa-map-marker-alt"></i> ${booking.house.location}</p>
-                    <p><strong>KSh ${(booking.house.price_per_night * 30).toLocaleString()}/month</strong></p>
+                    <p><strong>KSh ${booking.house.price_per_month.toLocaleString()}/month</strong></p>
                 </div>
             </div>
             
@@ -1428,7 +1427,7 @@ function viewBookingDetails(bookingId) {
                 <h4><i class="fas fa-home"></i> Property Information</h4>
                 <p><strong>Name:</strong> ${booking.house.name}</p>
                 <p><strong>Location:</strong> ${booking.house.location}</p>
-                <p><strong>Price:</strong> KSh ${(booking.house.price_per_night * 30).toLocaleString()}/month</p>
+                <p><strong>Price:</strong> KSh ${booking.house.price_per_month.toLocaleString()}/month</p>
             </div>
             
             <div class="schedule-section">

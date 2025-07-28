@@ -188,7 +188,7 @@ class HouseModel:
             'description': data.get('description', ''),
             'bedrooms': int(data['bedrooms']),
             'bathrooms': int(data.get('bathrooms', 1)),
-            'price_per_night': float(data['price_per_night']),
+            'price_per_month': float(data['price_per_month']),
             'location': data.get('location', ''),
             'amenities': data.get('amenities', []),
             'is_available': data.get('is_available', True),
@@ -225,8 +225,8 @@ class HouseModel:
             update_data['bedrooms'] = int(data['bedrooms'])
         if 'bathrooms' in data:
             update_data['bathrooms'] = int(data['bathrooms'])
-        if 'price_per_night' in data:
-            update_data['price_per_night'] = float(data['price_per_night'])
+        if 'price_per_month' in data:
+            update_data['price_per_month'] = float(data['price_per_month'])
         if 'location' in data:
             update_data['location'] = data['location']
         if 'amenities' in data:
@@ -286,7 +286,7 @@ class HouseModel:
             'description': house.get('description', ''),
             'bedrooms': house['bedrooms'],
             'bathrooms': house['bathrooms'],
-            'price_per_night': house['price_per_night'],
+            'price_per_month': house['price_per_month'],
             'location': house.get('location', ''),
             'amenities': house.get('amenities', []),
             'is_available': house.get('is_available', True),

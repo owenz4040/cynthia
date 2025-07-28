@@ -477,7 +477,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <img src="${property.images && property.images[0] ? property.images[0].image_url : 'https://via.placeholder.com/300x200'}" 
                          alt="${property.name}" 
                          onerror="this.src='https://via.placeholder.com/300x200'">
-                    <div class="property-price">KSh ${(property.price_per_night * 30).toLocaleString()}/month</div>
+                    <div class="property-price">KSh ${property.price_per_month.toLocaleString()}/month</div>
                 </div>
                 <div class="property-info">
                     <h4 class="property-title">${property.name}</h4>
@@ -725,7 +725,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <img src="${property.images && property.images[0] ? property.images[0].image_url : 'https://via.placeholder.com/300x200'}" 
                          alt="${property.name}"
                          onerror="this.src='https://via.placeholder.com/300x200'">
-                    <div class="property-price">KSh ${(property.price_per_night * 30).toLocaleString()}/month</div>
+                    <div class="property-price">KSh ${property.price_per_month.toLocaleString()}/month</div>
                 </div>
                 <div class="property-info">
                     <h4 class="property-title">${property.name}</h4>
@@ -928,7 +928,7 @@ function openBookingModal(propertyId) {
             <div class="property-details-small">
                 <h4>${property.name}</h4>
                 <p><i class="fas fa-map-marker-alt"></i> ${property.location}</p>
-                <p><strong>KSh ${(property.price_per_night * 30).toLocaleString()}/month</strong></p>
+                <p><strong>KSh ${property.price_per_month.toLocaleString()}/month</strong></p>
             </div>
         </div>
     `;
@@ -955,7 +955,7 @@ function getCurrentProperty(propertyId) {
                 _id: propertyId,
                 name: card.querySelector('.property-title')?.textContent || 'Property',
                 location: card.querySelector('.property-location')?.textContent?.replace('📍', '').trim() || 'Location',
-                price_per_night: card.querySelector('.property-price')?.textContent?.match(/\d+/)?.[0] || '0',
+                price_per_month: card.querySelector('.property-price')?.textContent?.match(/\d+/)?.[0] || '0',
                 images: [{
                     image_url: card.querySelector('.property-image img')?.src || ''
                 }]
@@ -1132,7 +1132,7 @@ function renderBookings(bookings) {
                 <div class="property-details-small">
                     <h4>${booking.house.name}</h4>
                     <p><i class="fas fa-map-marker-alt"></i> ${booking.house.location}</p>
-                    <p><strong>KSh ${(booking.house.price_per_night * 30).toLocaleString()}/month</strong></p>
+                    <p><strong>KSh ${booking.house.price_per_month.toLocaleString()}/month</strong></p>
                 </div>
             </div>
             
