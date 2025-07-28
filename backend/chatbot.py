@@ -361,10 +361,9 @@ class RentalSystemChatbot:
     def _list_available_properties(self) -> Dict[str, Any]:
         """List available properties with details"""
         try:
-            # Get available properties from database
+            # Get available properties from database (get all fields for backward compatibility)
             available_properties = list(mongo.db.houses.find(
-                {"is_available": True}, 
-                {"name": 1, "location": 1, "price_per_month": 1, "bedrooms": 1, "bathrooms": 1, "amenities": 1}
+                {"is_available": True}
             ).limit(10))  # Limit to 10 properties to avoid overwhelming response
             
             if not available_properties:
@@ -378,9 +377,14 @@ class RentalSystemChatbot:
             response = f"🏠 **Available Properties ({len(available_properties)} found):**\n\n"
             
             for i, prop in enumerate(available_properties, 1):
+                # Handle backward compatibility for price
+                price_per_month = prop.get('price_per_month')
+                if price_per_month is None and 'price_per_night' in prop:
+                    price_per_month = prop['price_per_night'] * 30
+                
                 response += f"**{i}. {prop.get('name', 'Unnamed Property')}**\n"
                 response += f"📍 {prop.get('location', 'Location not specified')}\n"
-                response += f"💰 KSh {prop.get('price_per_month', 0):,}/month\n"
+                response += f"💰 KSh {price_per_month or 0:,}/month\n"
                 response += f"🛏️ {prop.get('bedrooms', 0)} bed(s), 🚿 {prop.get('bathrooms', 0)} bath(s)\n"
                 
                 # Add amenities if available
@@ -416,7 +420,7 @@ class RentalSystemChatbot:
             total_properties = mongo.db.houses.count_documents({})
             available_properties = mongo.db.houses.count_documents({"is_available": True})
             
-            # Get price range
+            # Get price range - try new field first, then old field for backward compatibility
             price_stats = list(mongo.db.houses.aggregate([
                 {"$group": {
                     "_id": None,
@@ -425,6 +429,17 @@ class RentalSystemChatbot:
                     "avg_price": {"$avg": "$price_per_month"}
                 }}
             ]))
+            
+            # If no stats with new field, try with old field
+            if not price_stats or not price_stats[0].get('min_price'):
+                price_stats = list(mongo.db.houses.aggregate([
+                    {"$group": {
+                        "_id": None,
+                        "min_price": {"$multiply": [{"$min": "$price_per_night"}, 30]},
+                        "max_price": {"$multiply": [{"$max": "$price_per_night"}, 30]},
+                        "avg_price": {"$multiply": [{"$avg": "$price_per_night"}, 30]}
+                    }}
+                ]))
             
             response = f"🏠 **Property Statistics:**\n\n"
             response += f"• Total Properties: {total_properties}\n"

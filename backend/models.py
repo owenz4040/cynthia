@@ -280,13 +280,20 @@ class HouseModel:
         """Convert house document to dictionary."""
         if not house:
             return None
+        
+        # Handle backward compatibility: if old data has price_per_night, convert it to monthly
+        price_per_month = house.get('price_per_month')
+        if price_per_month is None and 'price_per_night' in house:
+            # Convert old daily price to monthly (multiply by 30)
+            price_per_month = house['price_per_night'] * 30
+        
         return {
             'id': str(house['_id']),
             'name': house['name'],
             'description': house.get('description', ''),
             'bedrooms': house['bedrooms'],
             'bathrooms': house['bathrooms'],
-            'price_per_month': house['price_per_month'],
+            'price_per_month': price_per_month or 0,
             'location': house.get('location', ''),
             'amenities': house.get('amenities', []),
             'is_available': house.get('is_available', True),
