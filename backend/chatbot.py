@@ -341,7 +341,11 @@ class RentalSystemChatbot:
     def _handle_data_request(self, user_input: str) -> Dict[str, Any]:
         """Handle requests for specific data"""
         try:
-            if "properties" in user_input or "houses" in user_input:
+            if ("show me" in user_input and ("properties" in user_input or "houses" in user_input)) or \
+               ("list" in user_input and ("properties" in user_input or "houses" in user_input)) or \
+               ("available properties" in user_input):
+                return self._list_available_properties()
+            elif "properties" in user_input or "houses" in user_input:
                 return self._get_property_stats()
             elif "users" in user_input:
                 return self._get_user_stats()
@@ -354,6 +358,58 @@ class RentalSystemChatbot:
         
         return self._get_default_response(user_input)
     
+    def _list_available_properties(self) -> Dict[str, Any]:
+        """List available properties with details"""
+        try:
+            # Get available properties from database
+            available_properties = list(mongo.db.houses.find(
+                {"is_available": True}, 
+                {"name": 1, "location": 1, "price_per_month": 1, "bedrooms": 1, "bathrooms": 1, "amenities": 1}
+            ).limit(10))  # Limit to 10 properties to avoid overwhelming response
+            
+            if not available_properties:
+                return {
+                    "response": "No properties are currently available. Please check back later or contact us for updates.",
+                    "category": "data_request",
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "confidence": 0.95
+                }
+            
+            response = f"🏠 **Available Properties ({len(available_properties)} found):**\n\n"
+            
+            for i, prop in enumerate(available_properties, 1):
+                response += f"**{i}. {prop.get('name', 'Unnamed Property')}**\n"
+                response += f"📍 {prop.get('location', 'Location not specified')}\n"
+                response += f"💰 KSh {prop.get('price_per_month', 0):,}/month\n"
+                response += f"🛏️ {prop.get('bedrooms', 0)} bed(s), 🚿 {prop.get('bathrooms', 0)} bath(s)\n"
+                
+                # Add amenities if available
+                amenities = prop.get('amenities', [])
+                if amenities:
+                    response += f"✨ {', '.join(amenities[:3])}"  # Show first 3 amenities
+                    if len(amenities) > 3:
+                        response += f" (+{len(amenities)-3} more)"
+                    response += "\n"
+                
+                response += "\n"
+            
+            response += "💡 To book any of these properties, visit our main platform and use the booking system!"
+            
+            return {
+                "response": response,
+                "category": "data_request",
+                "timestamp": datetime.utcnow().isoformat(),
+                "confidence": 0.95
+            }
+            
+        except Exception as e:
+            return {
+                "response": "Unable to retrieve available properties at the moment. Please try again later.",
+                "category": "error",
+                "timestamp": datetime.utcnow().isoformat(),
+                "confidence": 0.5
+            }
+
     def _get_property_stats(self) -> Dict[str, Any]:
         """Get property statistics"""
         try:

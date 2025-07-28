@@ -470,7 +470,7 @@ async function loadCarouselProperties() {
         console.log('Loading carousel properties...');
         
         // Make API call to public endpoint (no authentication required)
-        const response = await fetch(`${API_BASE}/houses/public?per_page=6`, {
+        const response = await fetch(`${API_BASE}/houses/public?per_page=10`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -485,11 +485,19 @@ async function loadCarouselProperties() {
             console.log('Properties data:', data);
             
             if (data.houses && data.houses.length > 0) {
-                carouselProperties = data.houses;
-                renderCarousel();
-                setupCarouselIndicators();
-                updateCarouselCounter();
-                console.log(`Loaded ${carouselProperties.length} real properties for carousel`);
+                // Filter only available properties
+                const availableProperties = data.houses.filter(house => house.is_available !== false);
+                
+                if (availableProperties.length > 0) {
+                    carouselProperties = availableProperties;
+                    renderCarousel();
+                    setupCarouselIndicators();
+                    updateCarouselCounter();
+                    console.log(`Loaded ${carouselProperties.length} real properties for carousel`);
+                } else {
+                    console.log('No available properties found, showing demo properties');
+                    showDemoProperties();
+                }
             } else {
                 console.log('No properties found in database, showing demo properties');
                 showDemoProperties();
