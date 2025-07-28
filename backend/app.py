@@ -100,10 +100,6 @@ def create_app(config_name=None):
             }
         })
     
-    # Create default admin account
-    with app.app_context():
-        create_default_admin()
-    
     return app
 
 # Create app instance for Gunicorn
