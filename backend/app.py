@@ -43,6 +43,17 @@ def create_app(config_name=None):
     # Register blueprints
     app.register_blueprint(api)
     
+    # Health check endpoint
+    @app.route('/health')
+    def health_check():
+        return jsonify({
+            'status': 'healthy',
+            'service': 'Rental House Booking API',
+            'version': '1.0.0',
+            'environment': app.config.get('FLASK_ENV', 'development'),
+            'database': 'connected' if mongo.db else 'disconnected'
+        })
+    
     # Add CORS headers to all responses
     @app.after_request
     def after_request(response):

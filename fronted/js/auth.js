@@ -118,16 +118,36 @@ class AuthUtils {
                 throw new Error('Token has expired. Please log in again.');
             }
             
-            const data = await response.json();
-            
+            // Handle network or server errors
             if (!response.ok) {
-                console.error('API error:', data);
-                throw new Error(data.error || `HTTP error! status: ${response.status}`);
+                let errorMessage = `HTTP error! status: ${response.status}`;
+                
+                try {
+                    const data = await response.json();
+                    errorMessage = data.error || errorMessage;
+                } catch (jsonError) {
+                    // If we can't parse JSON, use the status text
+                    errorMessage = response.statusText || errorMessage;
+                }
+                
+                console.error('API error:', { status: response.status, message: errorMessage });
+                throw new Error(errorMessage);
             }
             
+            const data = await response.json();
             return data;
         } catch (error) {
-            console.error('API Request failed:', { error, url, options });
+            console.error('API Request failed:', { error: error.message, url, options });
+            
+            // Provide more specific error messages
+            if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                throw new Error('Unable to connect to server. Please check your internet connection and try again.');
+            }
+            
+            if (error.message.includes('ECONNREFUSED') || error.message.includes('ERR_CONNECTION_REFUSED')) {
+                throw new Error('Server is not responding. Please try again later or contact support.');
+            }
+            
             throw error;
         }
     }

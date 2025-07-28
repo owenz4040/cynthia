@@ -6,6 +6,41 @@ const appState = {
     currentBookings: []
 };
 
+// Global activity tracking function
+window.trackActivity = function(icon, text) {
+    try {
+        // Get stored activities from localStorage
+        const storedActivities = localStorage.getItem('userActivities');
+        let activities = storedActivities ? JSON.parse(storedActivities) : [];
+        
+        const newActivity = {
+            icon: icon,
+            text: text,
+            time: 'Just now',
+            timestamp: new Date().toISOString()
+        };
+        
+        // Add new activity to the beginning
+        activities.unshift(newActivity);
+        
+        // Keep only the latest 10 activities
+        const trimmedActivities = activities.slice(0, 10);
+        
+        // Save to localStorage
+        localStorage.setItem('userActivities', JSON.stringify(trimmedActivities));
+        
+        console.log('Activity tracked:', text);
+        
+        // Update display if on dashboard and function exists
+        if (appState.currentPage === 'dashboard' && typeof loadActivity === 'function') {
+            loadActivity();
+        }
+    } catch (error) {
+        console.log('Activity tracking error:', error.message);
+        console.log('Activity:', icon, text);
+    }
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     // Ensure user is authenticated and has accepted terms
     if (!AuthUtils.isAuthenticated()) {
@@ -954,11 +989,23 @@ async function handleBookingSubmit(e) {
         // Check authentication before making request
         if (!AuthUtils.isAuthenticated()) {
             console.warn('User not authenticated, redirecting to login');
+            showNotification('Please log in to book a site visit', 'error');
+            return;
+        }
+        
+        // Check if terms are accepted
+        if (!AuthUtils.hasSiteVisitTermsAccepted()) {
+            console.warn('Site visit terms not accepted');
+            showNotification('Please accept the site visit terms before booking', 'error');
             return;
         }
         
         const formData = new FormData(e.target);
         const propertyId = e.target.dataset.propertyId;
+        
+        if (!propertyId) {
+            throw new Error('Property ID is missing');
+        }
         
         const bookingData = {
             house_id: propertyId,
@@ -969,15 +1016,26 @@ async function handleBookingSubmit(e) {
             terms_accepted_date: AuthUtils.getSiteVisitTermsAcceptedDate()
         };
         
+        // Validate booking data
+        if (!bookingData.preferred_date || !bookingData.preferred_time) {
+            throw new Error('Please select both a preferred date and time');
+        }
+        
+        console.log('Submitting booking data:', bookingData);
+        
         const result = await AuthUtils.apiRequest('/bookings', {
             method: 'POST',
             body: JSON.stringify(bookingData)
         });
         
         // Track booking activity
-        const property = getCurrentProperty(propertyId);
-        const propertyName = property ? property.name : 'a property';
-        trackActivity('fa-calendar-plus', `You scheduled a site visit for "${propertyName}"`);
+        try {
+            const property = getCurrentProperty(propertyId);
+            const propertyName = property ? property.name : 'a property';
+            trackActivity('fa-calendar-plus', `You scheduled a site visit for "${propertyName}"`);
+        } catch (activityError) {
+            console.log('Could not track activity:', activityError.message);
+        }
         
         showNotification('Site review booking submitted successfully! Please remember to bring valid Kenyan ID and arrive on time. You will receive an email confirmation once approved.', 'success');
         closeModal('bookingModal');
