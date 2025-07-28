@@ -43,17 +43,6 @@ def create_app(config_name=None):
     # Register blueprints
     app.register_blueprint(api)
     
-    # Health check endpoint
-    @app.route('/health')
-    def health_check():
-        return jsonify({
-            'status': 'healthy',
-            'service': 'Rental House Booking API',
-            'version': '1.0.0',
-            'environment': app.config.get('FLASK_ENV', 'development'),
-            'database': 'connected' if mongo.db else 'disconnected'
-        })
-    
     # Add CORS headers to all responses
     @app.after_request
     def after_request(response):
@@ -111,23 +100,9 @@ def create_app(config_name=None):
             }
         })
     
-    # Health check endpoint
-    @app.route('/health')
-    def health_check():
-        try:
-            # Test MongoDB connection
-            mongo.db.command('ping')
-            return jsonify({
-                'status': 'healthy', 
-                'message': 'API is running',
-                'database': 'MongoDB connected'
-            }), 200
-        except Exception as e:
-            return jsonify({
-                'status': 'unhealthy',
-                'message': 'Database connection failed',
-                'error': str(e)
-            }), 500
+    # Create default admin account
+    with app.app_context():
+        create_default_admin()
     
     return app
 

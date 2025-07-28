@@ -163,13 +163,16 @@
             try {
                 showResult('apiResult', 'Testing API connection...', 'info');
                 
-                const response = await fetch(Config.API_BASE.replace('/api', '') + '/health');
+                // Test both root and health endpoints
+                const rootResponse = await fetch(Config.API_BASE.replace('/api', ''));
+                const healthResponse = await fetch(Config.API_BASE + '/health');
                 
-                if (response.ok) {
-                    const data = await response.json();
-                    showResult('apiResult', `✅ API is responding:\n${JSON.stringify(data, null, 2)}`, 'success');
+                if (rootResponse.ok && healthResponse.ok) {
+                    const rootData = await rootResponse.json();
+                    const healthData = await healthResponse.json();
+                    showResult('apiResult', `✅ API is responding:\nRoot: ${JSON.stringify(rootData, null, 2)}\n\nHealth: ${JSON.stringify(healthData, null, 2)}`, 'success');
                 } else {
-                    showResult('apiResult', `❌ API responded with status: ${response.status}`, 'error');
+                    showResult('apiResult', `❌ API responded with status: Root=${rootResponse.status}, Health=${healthResponse.status}`, 'error');
                 }
             } catch (error) {
                 showResult('apiResult', `❌ API connection failed: ${error.message}`, 'error');
