@@ -17,20 +17,28 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px 0;
+            padding: 0;
+            margin: 0;
             line-height: 1.6;
             width: 100%;
             overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
         }
 
         .page-container {
             max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
             width: 100%;
+            margin: 0 auto;
+            padding: 20px;
             box-sizing: border-box;
-            display: block;
-            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
         }
 
         .terms-container {
@@ -38,10 +46,11 @@
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
             overflow: hidden;
-            margin: 20px auto;
+            margin: 0 auto;
             width: 100%;
-            max-width: 100%;
+            max-width: 1200px;
             position: relative;
+            display: block;
         }
         
         .terms-header {
@@ -349,15 +358,16 @@
 
         .navigation-hint {
             position: fixed;
-            top: 20px;
-            left: 20px;
+            top: 30px;
+            left: 30px;
             background: rgba(255, 255, 255, 0.95);
-            padding: 15px 20px;
+            padding: 15px 25px;
             border-radius: 50px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(15px);
             z-index: 1000;
             transition: all 0.3s ease;
+            border: 2px solid rgba(102, 126, 234, 0.2);
         }
 
         .navigation-hint:hover {
@@ -379,15 +389,20 @@
             .terms-grid {
                 grid-template-columns: 1fr;
             }
+            
+            .page-container {
+                padding: 15px;
+            }
         }
 
         @media (max-width: 768px) {
             body {
-                padding: 10px 0;
+                padding: 0;
             }
 
             .page-container {
-                padding: 0 10px;
+                padding: 10px;
+                min-height: auto;
             }
             
             .terms-header {
@@ -435,11 +450,10 @@
             }
 
             .navigation-hint {
-                position: relative;
-                top: auto;
-                left: auto;
-                margin-bottom: 20px;
+                position: static;
+                margin: 0 auto 20px auto;
                 display: inline-block;
+                transform: none !important;
             }
         }
 
