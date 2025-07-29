@@ -267,6 +267,21 @@ body {
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
 }
 
+/* Special handling for featured properties carousel */
+.dashboard-card:has(.featured-carousel) {
+    padding: 0;
+    overflow: hidden;
+}
+
+.dashboard-card:has(.featured-carousel) .card-header {
+    padding: 25px 25px 15px 25px;
+    margin-bottom: 0;
+}
+
+.featured-properties {
+    margin: 0;
+}
+
 .card-header {
     display: flex;
     justify-content: space-between;
@@ -410,27 +425,58 @@ body {
 
 .property-image {
     height: 200px;
-    background: #f0f0f0;
+    background: linear-gradient(135deg, #f0f0f0, #e8e8e8);
     position: relative;
     overflow: hidden;
+}
+
+.property-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left 0.6s ease;
+    z-index: 2;
+}
+
+.property-card:hover .property-image::before {
+    left: 100%;
 }
 
 .property-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.property-card:hover .property-image img {
+    transform: scale(1.1) rotate(1deg);
+    filter: brightness(1.1) contrast(1.05);
 }
 
 .property-price {
     position: absolute;
     top: 15px;
     right: 15px;
-    background: rgba(0, 0, 0, 0.8);
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.7));
     color: white;
-    padding: 8px 12px;
-    border-radius: 8px;
+    padding: 10px 15px;
+    border-radius: 25px;
     font-weight: 600;
     font-size: 0.9rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    z-index: 3;
+}
+
+.property-card:hover .property-price {
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
 .property-info {
@@ -465,43 +511,115 @@ body {
     gap: 5px;
     color: #666;
     font-size: 0.85rem;
+    padding: 6px 10px;
+    background: rgba(102, 126, 234, 0.05);
+    border-radius: 15px;
+    transition: all 0.3s ease;
+}
+
+.property-card:hover .feature {
+    background: rgba(102, 126, 234, 0.1);
+    transform: translateY(-1px);
 }
 
 .feature i {
     color: #667eea;
+    transition: all 0.3s ease;
+}
+
+.property-card:hover .feature i {
+    color: #764ba2;
+    transform: scale(1.1);
 }
 
 .property-actions {
     display: flex;
-    gap: 10px;
+    gap: 12px;
 }
 
 .btn-primary {
     flex: 1;
-    padding: 10px;
+    padding: 12px 16px;
     background: linear-gradient(135deg, #667eea, #764ba2);
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.6s ease;
 }
 
 .btn-primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    background: linear-gradient(135deg, #764ba2, #667eea);
+}
+
+.btn-primary:hover::before {
+    left: 100%;
+}
+
+.btn-primary:active {
+    transform: translateY(0);
 }
 
 .btn-heart {
-    width: 40px;
-    height: 40px;
-    background: #f8f9fa;
-    border: 1px solid #e1e5e9;
-    border-radius: 8px;
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    border-radius: 12px;
     display: flex;
     align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-heart::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 107, 107, 0.1);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    transform: translate(-50%, -50%);
+}
+
+.btn-heart:hover {
+    background: linear-gradient(135deg, #fff, #f8f9fa);
+    border-color: #ff6b6b;
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.2);
+}
+
+.btn-heart:hover::before {
+    width: 100%;
+    height: 100%;
+}
+
+.btn-heart:hover i {
+    color: #ff6b6b;
+    transform: scale(1.2);
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -513,6 +631,269 @@ body {
     background: #ff6b6b;
     border-color: #ff6b6b;
     color: white;
+}
+
+/* Featured Properties Carousel */
+.featured-carousel {
+    position: relative;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.featured-carousel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="30" cy="25" r="0.5" fill="rgba(255,255,255,0.08)"/><circle cx="60" cy="15" r="0.8" fill="rgba(255,255,255,0.12)"/><circle cx="80" cy="30" r="0.6" fill="rgba(255,255,255,0.1)"/><circle cx="20" cy="50" r="0.7" fill="rgba(255,255,255,0.09)"/><circle cx="70" cy="60" r="1.2" fill="rgba(255,255,255,0.08)"/><circle cx="90" cy="80" r="0.4" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="75" r="0.9" fill="rgba(255,255,255,0.07)"/></svg>');
+    background-size: 200px 200px;
+    animation: floatingParticles 20s linear infinite;
+    pointer-events: none;
+    z-index: 1;
+}
+
+@keyframes floatingParticles {
+    0% { transform: translateY(0) rotate(0deg); }
+    100% { transform: translateY(-200px) rotate(360deg); }
+}
+
+.featured-carousel:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 30px 80px rgba(102, 126, 234, 0.4);
+}
+
+.carousel-container {
+    overflow: hidden;
+    position: relative;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    z-index: 2;
+}
+
+.carousel-track {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.carousel-slide {
+    min-width: 100%;
+    opacity: 0;
+    transform: translateX(100%) scale(0.95);
+    transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    filter: blur(2px);
+}
+
+.carousel-slide.active {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    position: relative;
+    filter: blur(0);
+}
+
+.carousel-slide .property-card {
+    margin: 0;
+    box-shadow: none;
+    border-radius: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.carousel-slide .property-card:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: scale(1.02);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.carousel-controls {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.featured-carousel:hover .carousel-controls {
+    opacity: 1;
+}
+
+.carousel-btn {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    pointer-events: all;
+    color: #667eea;
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.carousel-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+    transition: left 0.6s ease;
+}
+
+.carousel-btn:hover {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.95));
+    transform: scale(1.15) rotate(5deg);
+    box-shadow: 0 12px 35px rgba(102, 126, 234, 0.3);
+    border-color: rgba(102, 126, 234, 0.4);
+}
+
+.carousel-btn:hover::before {
+    left: 100%;
+}
+
+.carousel-btn:active {
+    transform: scale(1.05) rotate(2deg);
+}
+
+.play-pause-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.6));
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.play-pause-btn:hover {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.7));
+    color: white;
+    transform: scale(1.1);
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.carousel-indicators {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 25px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.1));
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.indicator {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.indicator::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    transform: translate(-50%, -50%);
+}
+
+.indicator.active {
+    background: rgba(255, 255, 255, 0.9);
+    transform: scale(1.4);
+    border-color: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+.indicator.active::before {
+    width: 8px;
+    height: 8px;
+}
+
+.indicator:hover {
+    background: rgba(255, 255, 255, 0.7);
+    transform: scale(1.2);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.carousel-progress {
+    height: 6px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.2));
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #fff, rgba(255, 255, 255, 0.8));
+    transition: width 0.3s ease;
+    border-radius: 3px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Responsive carousel */
+@media (max-width: 768px) {
+    .carousel-controls {
+        padding: 0 15px;
+    }
+    
+    .carousel-btn {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .play-pause-btn {
+        width: 35px;
+        height: 35px;
+        top: 15px;
+        right: 15px;
+    }
+    
+    .carousel-indicators {
+        padding: 15px;
+    }
+    
+    .indicator {
+        width: 10px;
+        height: 10px;
+    }
 }
 
 /* Profile Section */
@@ -1265,6 +1646,81 @@ input:checked + .slider:before {
 .btn-outline:hover {
     background: #667eea;
     color: white;
+}
+
+/* Additional Carousel Animations and Effects */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+@keyframes glow {
+    0%, 100% { box-shadow: 0 0 5px rgba(102, 126, 234, 0.3); }
+    50% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.6); }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%) scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(-100%) scale(0.8);
+        opacity: 0;
+    }
+}
+
+/* Enhanced property card entrance animations */
+.property-card {
+    animation: slideIn 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Glowing effect for active indicators */
+.indicator.active {
+    animation: glow 2s ease-in-out infinite;
+}
+
+/* Pulsing effect for autoplay button */
+.play-pause-btn {
+    animation: pulse 3s ease-in-out infinite;
+}
+
+/* Smooth hover transitions for all interactive elements */
+.carousel-btn,
+.indicator,
+.btn-primary,
+.btn-heart {
+    will-change: transform;
+}
+
+/* Loading shimmer effect */
+@keyframes shimmer {
+    0% { background-position: -1000px 0; }
+    100% { background-position: 1000px 0; }
+}
+
+.featured-carousel.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite;
+    z-index: 10;
 }
 
 /* Property Actions Enhancement */

@@ -471,45 +471,208 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        const html = properties.map(property => `
-            <div class="property-card" onclick="viewProperty('${property._id}')">
-                <div class="property-image">
-                    <img src="${property.images && property.images[0] ? property.images[0].image_url : 'https://via.placeholder.com/300x200'}" 
-                         alt="${property.name}" 
-                         onerror="this.src='https://via.placeholder.com/300x200'">
-                    <div class="property-price">KSh ${property.price_per_month.toLocaleString()}/month</div>
+        // Create carousel wrapper
+        const carouselHTML = `
+            <div class="featured-carousel">
+                <div class="carousel-container">
+                    <div class="carousel-track" id="featuredCarouselTrack">
+                        ${properties.map((property, index) => `
+                            <div class="property-card carousel-slide ${index === 0 ? 'active' : ''}" onclick="viewProperty('${property._id}')">
+                                <div class="property-image">
+                                    <img src="${property.images && property.images[0] ? property.images[0].image_url : 'https://via.placeholder.com/300x200'}" 
+                                         alt="${property.name}" 
+                                         onerror="this.src='https://via.placeholder.com/300x200'">
+                                    <div class="property-price">KSh ${property.price_per_month.toLocaleString()}/month</div>
+                                </div>
+                                <div class="property-info">
+                                    <h4 class="property-title">${property.name}</h4>
+                                    <p class="property-location">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        ${property.location || 'Location not specified'}
+                                    </p>
+                                    <div class="property-features">
+                                        <span class="feature">
+                                            <i class="fas fa-bed"></i>
+                                            ${property.bedrooms} bed${property.bedrooms !== 1 ? 's' : ''}
+                                        </span>
+                                        <span class="feature">
+                                            <i class="fas fa-bath"></i>
+                                            ${property.bathrooms} bath${property.bathrooms !== 1 ? 's' : ''}
+                                        </span>
+                                    </div>
+                                    <div class="property-actions">
+                                        <button class="btn-primary" onclick="event.stopPropagation(); bookProperty('${property._id}')">
+                                            Book Now
+                                        </button>
+                                        <button class="btn-heart" onclick="event.stopPropagation(); toggleFavorite('${property._id}')">
+                                            <i class="fas fa-heart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
                 </div>
-                <div class="property-info">
-                    <h4 class="property-title">${property.name}</h4>
-                    <p class="property-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        ${property.location || 'Location not specified'}
-                    </p>
-                    <div class="property-features">
-                        <span class="feature">
-                            <i class="fas fa-bed"></i>
-                            ${property.bedrooms} bed${property.bedrooms !== 1 ? 's' : ''}
-                        </span>
-                        <span class="feature">
-                            <i class="fas fa-bath"></i>
-                            ${property.bathrooms} bath${property.bathrooms !== 1 ? 's' : ''}
-                        </span>
-                    </div>
-                    <div class="property-actions">
-                        <button class="btn-primary" onclick="event.stopPropagation(); bookProperty('${property._id}')">
-                            Book Now
-                        </button>
-                        <button class="btn-heart" onclick="event.stopPropagation(); toggleFavorite('${property._id}')">
-                            <i class="fas fa-heart"></i>
-                        </button>
-                    </div>
+                
+                <!-- Carousel controls -->
+                <div class="carousel-controls">
+                    <button class="carousel-btn prev-btn" onclick="featuredCarousel.previous()">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="carousel-btn next-btn" onclick="featuredCarousel.next()">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <button class="carousel-btn play-pause-btn" onclick="featuredCarousel.toggleAutoPlay()">
+                        <i class="fas fa-pause" id="playPauseIcon"></i>
+                    </button>
+                </div>
+                
+                <!-- Carousel indicators -->
+                <div class="carousel-indicators">
+                    ${properties.map((_, index) => `
+                        <span class="indicator ${index === 0 ? 'active' : ''}" onclick="featuredCarousel.goToSlide(${index})"></span>
+                    `).join('')}
+                </div>
+                
+                <!-- Progress bar -->
+                <div class="carousel-progress">
+                    <div class="progress-bar" id="featuredProgressBar"></div>
                 </div>
             </div>
-        `).join('');
+        `;
         
-        container.innerHTML = html;
+        container.innerHTML = carouselHTML;
+        
+        // Initialize carousel
+        initializeFeaturedCarousel(properties.length);
     }
-    
+
+    // Featured Properties Carousel
+    let featuredCarousel = {
+        currentSlide: 0,
+        totalSlides: 0,
+        autoPlayInterval: null,
+        isAutoPlaying: true,
+        autoPlayDelay: 4000, // 4 seconds
+
+        init: function(slideCount) {
+            this.totalSlides = slideCount;
+            this.currentSlide = 0;
+            this.startAutoPlay();
+            this.updateProgressBar();
+        },
+
+        next: function() {
+            this.currentSlide = (this.currentSlide + 1) % this.totalSlides;
+            this.updateSlides();
+            this.restartAutoPlay();
+        },
+
+        previous: function() {
+            this.currentSlide = (this.currentSlide - 1 + this.totalSlides) % this.totalSlides;
+            this.updateSlides();
+            this.restartAutoPlay();
+        },
+
+        goToSlide: function(slideIndex) {
+            this.currentSlide = slideIndex;
+            this.updateSlides();
+            this.restartAutoPlay();
+        },
+
+        updateSlides: function() {
+            const slides = document.querySelectorAll('.carousel-slide');
+            const indicators = document.querySelectorAll('.carousel-indicators .indicator');
+            
+            slides.forEach((slide, index) => {
+                slide.classList.toggle('active', index === this.currentSlide);
+            });
+            
+            indicators.forEach((indicator, index) => {
+                indicator.classList.toggle('active', index === this.currentSlide);
+            });
+
+            this.updateProgressBar();
+        },
+
+        startAutoPlay: function() {
+            if (this.autoPlayInterval) {
+                clearInterval(this.autoPlayInterval);
+            }
+            
+            if (this.isAutoPlaying && this.totalSlides > 1) {
+                this.autoPlayInterval = setInterval(() => {
+                    this.next();
+                }, this.autoPlayDelay);
+            }
+        },
+
+        stopAutoPlay: function() {
+            if (this.autoPlayInterval) {
+                clearInterval(this.autoPlayInterval);
+                this.autoPlayInterval = null;
+            }
+        },
+
+        restartAutoPlay: function() {
+            if (this.isAutoPlaying) {
+                this.stopAutoPlay();
+                this.startAutoPlay();
+            }
+        },
+
+        toggleAutoPlay: function() {
+            this.isAutoPlaying = !this.isAutoPlaying;
+            const icon = document.getElementById('playPauseIcon');
+            
+            if (this.isAutoPlaying) {
+                icon.className = 'fas fa-pause';
+                this.startAutoPlay();
+            } else {
+                icon.className = 'fas fa-play';
+                this.stopAutoPlay();
+            }
+        },
+
+        updateProgressBar: function() {
+            const progressBar = document.getElementById('featuredProgressBar');
+            if (progressBar && this.totalSlides > 0) {
+                const progress = ((this.currentSlide + 1) / this.totalSlides) * 100;
+                progressBar.style.width = `${progress}%`;
+            }
+        }
+    };
+
+    function initializeFeaturedCarousel(slideCount) {
+        featuredCarousel.init(slideCount);
+        
+        // Add keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') {
+                featuredCarousel.previous();
+            } else if (e.key === 'ArrowRight') {
+                featuredCarousel.next();
+            } else if (e.key === ' ') {
+                e.preventDefault();
+                featuredCarousel.toggleAutoPlay();
+            }
+        });
+
+        // Pause autoplay on hover
+        const carouselContainer = document.querySelector('.featured-carousel');
+        if (carouselContainer) {
+            carouselContainer.addEventListener('mouseenter', () => {
+                featuredCarousel.stopAutoPlay();
+            });
+            
+            carouselContainer.addEventListener('mouseleave', () => {
+                if (featuredCarousel.isAutoPlaying) {
+                    featuredCarousel.startAutoPlay();
+                }
+            });
+        }
+    }
+
     async function loadStats() {
         try {
             // Simulate stats loading - in real app, these would come from API
