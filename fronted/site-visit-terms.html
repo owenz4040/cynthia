@@ -7,333 +7,651 @@
     <link rel="stylesheet" href="css/auth.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .terms-container {
-            max-width: 800px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+            line-height: 1.6;
+        }
+
+        .page-container {
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 0 20px;
+        }
+
+        .terms-container {
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            margin: 20px 0;
         }
         
         .terms-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
             text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #f0f0f0;
+            padding: 60px 40px;
+            position: relative;
+        }
+
+        .terms-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="20" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="40" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="90" cy="70" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="10" cy="80" r="2.5" fill="rgba(255,255,255,0.1)"/></svg>');
+            background-size: 300px 300px;
+            animation: floatPattern 20s linear infinite;
+        }
+
+        @keyframes floatPattern {
+            0% { transform: translateX(0) translateY(0); }
+            100% { transform: translateX(-300px) translateY(-300px); }
         }
         
         .terms-header h1 {
-            color: #2c3e50;
-            margin-bottom: 10px;
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+            position: relative;
+            z-index: 2;
         }
-        
-        .terms-header p {
-            color: #7f8c8d;
-            font-size: 16px;
+
+        .terms-header .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+
+        .terms-header i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            opacity: 0.8;
+            position: relative;
+            z-index: 2;
         }
         
         .terms-content {
-            line-height: 1.8;
-            color: #34495e;
+            padding: 50px;
+            max-width: none;
+        }
+
+        .important-notice {
+            background: linear-gradient(135deg, #ffeaa7, #fab1a0);
+            color: #2d3436;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            border-left: 5px solid #e17055;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .important-notice::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        .important-notice h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
+        .terms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
         .terms-section {
-            margin-bottom: 25px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #3498db;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 30px;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .terms-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(102, 126, 234, 0.05), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .terms-section:hover::before {
+            transform: translateX(100%);
+        }
+
+        .terms-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.15);
+            border-left-color: #764ba2;
         }
         
         .terms-section h2 {
             color: #2c3e50;
-            margin-bottom: 15px;
-            font-size: 20px;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .terms-section h2 i {
+            color: #667eea;
+            font-size: 1.2rem;
         }
         
         .terms-section p {
-            margin-bottom: 12px;
+            margin-bottom: 15px;
+            color: #555;
+            position: relative;
+            z-index: 2;
         }
         
         .terms-section ul {
-            margin-left: 20px;
-            margin-bottom: 15px;
+            margin-left: 25px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 2;
         }
         
         .terms-section li {
+            margin-bottom: 12px;
+            color: #555;
+            padding-left: 5px;
+        }
+
+        .terms-section li::marker {
+            color: #667eea;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border: 1px solid #e9c46a;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            border: 1px solid #e74c3c;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+            border: 1px solid #3498db;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .highlight-box strong,
+        .warning-box strong,
+        .info-box strong {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             margin-bottom: 8px;
         }
         
-        .highlight-box {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-        }
-        
-        .warning-box {
-            background: #f8d7da;
-            border: 1px solid #f5c6cb;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-        }
-        
-        .info-box {
-            background: #d1ecf1;
-            border: 1px solid #bee5eb;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-        }
-        
         .acceptance-section {
-            background: #e8f5e8;
-            border: 2px solid #28a745;
-            padding: 20px;
-            border-radius: 12px;
-            margin-top: 30px;
-            text-align: center;
-        }
-        
-        .btn-accept {
-            background: #28a745;
+            background: linear-gradient(135deg, #00b894, #00cec9);
             color: white;
-            padding: 12px 30px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            margin: 10px;
-            transition: background 0.3s;
+            padding: 40px;
+            border-radius: 20px;
+            margin-top: 50px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .acceptance-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="90" cy="20" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="20" cy="80" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="90" r="1.2" fill="rgba(255,255,255,0.1)"/></svg>');
+            background-size: 200px 200px;
+            animation: floatPattern 15s linear infinite reverse;
+        }
+
+        .acceptance-section h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .acceptance-section p {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+
+        .acceptance-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 2;
         }
         
+        .btn-accept,
+        .btn-decline {
+            padding: 15px 35px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 180px;
+            justify-content: center;
+        }
+
+        .btn-accept {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
         .btn-accept:hover {
-            background: #218838;
+            background: linear-gradient(135deg, #00a085, #00b7b8);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 184, 148, 0.4);
         }
         
         .btn-decline {
-            background: #dc3545;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
             color: white;
-            padding: 12px 30px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            margin: 10px;
-            transition: background 0.3s;
+            border: 2px solid rgba(255, 255, 255, 0.3);
         }
-        
+
         .btn-decline:hover {
-            background: #c82333;
+            background: linear-gradient(135deg, #dc3545, #a93226);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(231, 76, 60, 0.4);
         }
         
         .last-updated {
             text-align: center;
             color: #6c757d;
             font-style: italic;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #e9ecef;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e9ecef;
+            font-size: 1rem;
         }
 
-        /* Mobile Responsive Styles */
+        .navigation-hint {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 20px;
+            border-radius: 50px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .navigation-hint:hover {
+            background: white;
+            transform: scale(1.05);
+        }
+
+        .navigation-hint a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .terms-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         @media (max-width: 768px) {
             body {
-                font-size: 16px; /* Prevent zoom on input focus */
-                line-height: 1.6;
-                padding: 10px;
+                padding: 10px 0;
+            }
+
+            .page-container {
+                padding: 0 10px;
             }
             
-            .terms-container {
-                margin: 10px;
-                padding: 15px;
-                max-width: 100%;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            .terms-header {
+                padding: 40px 25px;
             }
-            
+
             .terms-header h1 {
-                font-size: 1.8rem;
-                margin-bottom: 15px;
+                font-size: 2.2rem;
+            }
+
+            .terms-header .subtitle {
+                font-size: 1rem;
             }
             
-            .terms-header p {
-                font-size: 14px;
+            .terms-content {
+                padding: 30px 25px;
             }
-            
+
+            .terms-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
             .terms-section {
-                margin-bottom: 20px;
-                padding: 15px;
+                padding: 25px 20px;
             }
             
             .terms-section h2 {
-                font-size: 1.3rem;
-                margin-bottom: 15px;
-            }
-            
-            .terms-section h3 {
-                font-size: 1.1rem;
-                margin-bottom: 10px;
-            }
-            
-            .warning-box, .info-box {
-                padding: 12px;
-                margin: 12px 0;
-                font-size: 14px;
-            }
-            
-            .acceptance-section {
-                padding: 15px;
-                margin-top: 25px;
-            }
-            
-            .acceptance-section h3 {
                 font-size: 1.2rem;
             }
-            
-            .back-button {
-                padding: 12px 20px;
-                font-size: 14px;
+
+            .acceptance-section {
+                padding: 30px 20px;
+            }
+
+            .acceptance-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn-accept,
+            .btn-decline {
                 width: 100%;
-                max-width: 200px;
-                margin: 0 auto;
-                display: block;
+                max-width: 280px;
+            }
+
+            .navigation-hint {
+                position: relative;
+                top: auto;
+                left: auto;
+                margin-bottom: 20px;
+                display: inline-block;
             }
         }
 
         @media (max-width: 480px) {
-            .terms-container {
-                margin: 5px;
-                padding: 12px;
-                border-radius: 8px;
-            }
-            
             .terms-header h1 {
-                font-size: 1.5rem;
+                font-size: 1.8rem;
             }
-            
+
+            .terms-content {
+                padding: 20px 15px;
+            }
+
             .terms-section {
-                padding: 12px;
-                margin-bottom: 15px;
+                padding: 20px 15px;
             }
-            
-            .terms-section h2 {
-                font-size: 1.2rem;
+
+            .important-notice,
+            .highlight-box,
+            .warning-box,
+            .info-box {
+                padding: 15px;
             }
-            
-            .terms-section h3 {
-                font-size: 1rem;
-            }
-            
-            ul li {
-                margin-bottom: 8px;
-                font-size: 14px;
-            }
-            
-            .warning-box, .info-box {
-                padding: 10px;
-                font-size: 13px;
-            }
+        }
+
+        /* Scroll Progress Bar */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            z-index: 9999;
+        }
+
+        .scroll-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00b894, #00cec9);
+            width: 0%;
+            transition: width 0.3s ease;
         }
     </style>
 </head>
 <body>
-    <div class="auth-container">
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress">
+        <div class="scroll-progress-bar" id="scrollProgressBar"></div>
+    </div>
+
+    <!-- Navigation Hint -->
+    <div class="navigation-hint">
+        <a href="javascript:history.back()">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <div class="page-container">
         <div class="terms-container">
             <div class="terms-header">
-                <h1><i class="fas fa-handshake"></i> Site Visit Terms & Conditions</h1>
-                <p>Kenyan Rental Marketing Platform</p>
+                <i class="fas fa-clipboard-check"></i>
+                <h1>Site Visit Terms & Conditions</h1>
+                <p class="subtitle">Please read and understand these terms before scheduling your property visit</p>
             </div>
             
             <div class="terms-content">
-                <div class="info-box">
-                    <p><strong>Important:</strong> By using this platform to schedule or attend site visits (property viewings), you agree to the following Terms and Conditions. These terms apply to both property seekers ("Users") and property owners/agents ("Listers").</p>
+                <div class="important-notice">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Important Notice</h3>
+                    <p><strong>Before scheduling a site visit, please carefully read and understand the following terms and conditions.</strong></p>
+                    <p>By accepting these terms, you acknowledge that you have read, understood, and agree to comply with all conditions outlined below. These terms are legally binding and ensure a safe, professional experience for all parties involved.</p>
                 </div>
-                
-                <div class="terms-section">
-                    <h2><i class="fas fa-calendar-check"></i> 1. Site Visit Scheduling</h2>
-                    <ul>
-                        <li>Users must request a property visit through the official booking system provided by the platform.</li>
-                        <li>Listers are required to confirm or propose alternative visit times within 24 hours of receiving a request.</li>
-                        <li>Repeated cancellations or no-shows by either party may lead to suspension of account privileges.</li>
-                    </ul>
+
+                <div class="terms-grid">
+                    <div class="terms-section">
+                        <h2><i class="fas fa-clock"></i> Appointment Scheduling</h2>
+                        <div class="info-box">
+                            <strong><i class="fas fa-info-circle"></i> Scheduling Requirements:</strong>
+                            <p>All appointments must follow our scheduling guidelines to ensure availability and proper preparation.</p>
+                        </div>
+                        <ul>
+                            <li>Site visits must be scheduled at least 24 hours in advance</li>
+                            <li>Appointments are available Monday through Saturday, 9:00 AM to 6:00 PM</li>
+                            <li>Sunday visits are available by special arrangement only</li>
+                            <li>Each visit is limited to a maximum of 2 hours</li>
+                            <li>Late arrivals (more than 15 minutes) may result in appointment cancellation</li>
+                        </ul>
+                        <div class="highlight-box">
+                            <strong><i class="fas fa-lightbulb"></i> Pro Tip:</strong>
+                            <p>Book your preferred time slot early, especially during peak seasons. Popular viewing times fill up quickly!</p>
+                        </div>
+                    </div>
+
+                    <div class="terms-section">
+                        <h2><i class="fas fa-id-card"></i> Visitor Requirements</h2>
+                        <div class="warning-box">
+                            <strong><i class="fas fa-exclamation-circle"></i> Mandatory Requirements:</strong>
+                            <p>All visitors must meet these requirements. No exceptions will be made for security and safety reasons.</p>
+                        </div>
+                        <ul>
+                            <li>Valid government-issued photo identification required for all visitors</li>
+                            <li>Maximum of 4 people per site visit group</li>
+                            <li>All visitors must be 18 years of age or older</li>
+                            <li>Visitors under 18 must be accompanied by a parent or legal guardian</li>
+                            <li>Business attire or casual dress code required (no shorts, flip-flops, or revealing clothing)</li>
+                        </ul>
+                    </div>
+
+                    <div class="terms-section">
+                        <h2><i class="fas fa-shield-alt"></i> Safety & Liability</h2>
+                        <div class="warning-box">
+                            <strong><i class="fas fa-hard-hat"></i> Safety First:</strong>
+                            <p>Your safety is our priority. Please follow all safety guidelines and instructions from our staff.</p>
+                        </div>
+                        <ul>
+                            <li>Visitors participate at their own risk and liability</li>
+                            <li>Closed-toe shoes are mandatory for all site visits</li>
+                            <li>Hard hats and safety equipment will be provided when necessary</li>
+                            <li>Visitors must follow all safety instructions from the tour guide</li>
+                            <li>The property owner/agent is not liable for accidents or injuries during the visit</li>
+                            <li>Visitors with medical conditions should inform the guide before the tour begins</li>
+                        </ul>
+                    </div>
+
+                    <div class="terms-section">
+                        <h2><i class="fas fa-camera"></i> Photography & Recording</h2>
+                        <div class="info-box">
+                            <strong><i class="fas fa-camera"></i> Photography Guidelines:</strong>
+                            <p>Capture memories while respecting privacy and property rules.</p>
+                        </div>
+                        <ul>
+                            <li>Photography for personal use is permitted unless otherwise specified</li>
+                            <li>Commercial photography requires prior written consent</li>
+                            <li>Video recording may be restricted in certain areas</li>
+                            <li>Respect privacy of current tenants if property is occupied</li>
+                            <li>Social media posting should be done responsibly and respectfully</li>
+                        </ul>
+                    </div>
+
+                    <div class="terms-section">
+                        <h2><i class="fas fa-handshake"></i> Professional Conduct</h2>
+                        <div class="highlight-box">
+                            <strong><i class="fas fa-users"></i> Respectful Behavior:</strong>
+                            <p>Maintain professionalism to ensure a positive experience for everyone involved.</p>
+                        </div>
+                        <ul>
+                            <li>Maintain respectful and professional behavior throughout the visit</li>
+                            <li>Do not touch or move personal belongings of current tenants</li>
+                            <li>Ask permission before opening cabinets, closets, or appliances</li>
+                            <li>Keep noise levels appropriate, especially in occupied buildings</li>
+                            <li>Smoking, vaping, and alcohol consumption are strictly prohibited</li>
+                            <li>Pets are not allowed during site visits unless it's a service animal</li>
+                        </ul>
+                    </div>
+
+                    <div class="terms-section">
+                        <h2><i class="fas fa-ban"></i> Prohibited Activities</h2>
+                        <div class="warning-box">
+                            <strong><i class="fas fa-ban"></i> Strictly Forbidden:</strong>
+                            <p>The following activities are prohibited and may result in immediate removal from the property.</p>
+                        </div>
+                        <ul>
+                            <li>Unauthorized access to restricted areas</li>
+                            <li>Disturbing other tenants or neighbors</li>
+                            <li>Bringing unauthorized guests beyond the confirmed visitor count</li>
+                            <li>Using property amenities without explicit permission</li>
+                            <li>Soliciting or conducting business activities during the visit</li>
+                        </ul>
+                    </div>
+
+                    <div class="terms-section">
+                        <h2><i class="fas fa-calendar-times"></i> Cancellation Policy</h2>
+                        <div class="info-box">
+                            <strong><i class="fas fa-calendar-check"></i> Flexible Scheduling:</strong>
+                            <p>We understand plans change. Here's our fair cancellation policy.</p>
+                        </div>
+                        <ul>
+                            <li>Cancellations must be made at least 4 hours before the scheduled time</li>
+                            <li>No-shows may be subject to restrictions on future bookings</li>
+                            <li>Weather-related cancellations will be rescheduled at no penalty</li>
+                            <li>Property owner reserves the right to cancel due to emergencies</li>
+                            <li>Repeated cancellations may result in booking privileges being revoked</li>
+                        </ul>
+                    </div>
+
+                    <div class="terms-section">
+                        <h2><i class="fas fa-gavel"></i> Legal Compliance</h2>
+                        <div class="warning-box">
+                            <strong><i class="fas fa-balance-scale"></i> Legal Requirements:</strong>
+                            <p>All activities must comply with applicable laws and regulations.</p>
+                        </div>
+                        <ul>
+                            <li>All local, state, and federal laws must be followed during the visit</li>
+                            <li>Visitors consent to background checks if required by property owner</li>
+                            <li>Any illegal activities will result in immediate termination of visit and potential legal action</li>
+                            <li>Property information shared during visit is confidential and should not be disclosed to unauthorized parties</li>
+                        </ul>
+                    </div>
                 </div>
-                
+
                 <div class="terms-section">
-                    <h2><i class="fas fa-shield-alt"></i> 2. Identification and Safety</h2>
+                    <h2><i class="fas fa-file-contract"></i> Agreement Terms</h2>
+                    <div class="important-notice">
+                        <h3><i class="fas fa-signature"></i> By Accepting These Terms:</h3>
+                        <p>You acknowledge and agree to comply with all conditions outlined above and understand the legal implications of this agreement.</p>
+                    </div>
                     <ul>
-                        <li>Users must carry valid Kenyan identification (ID or passport) during the visit.</li>
-                        <li>Listers must present proof of ownership or authorization to show the property if requested.</li>
-                        <li>All parties must conduct visits during daylight hours and in secure, public-friendly locations.</li>
-                        <li>Site visits must not be used for any illegal, fraudulent, or deceptive activity.</li>
+                        <li>Comply with all terms and conditions outlined above</li>
+                        <li>Assume personal responsibility for your safety and actions</li>
+                        <li>Respect the property, current tenants, and neighborhood</li>
+                        <li>Provide accurate information when scheduling your visit</li>
+                        <li>Understand that violation of these terms may result in immediate removal from the property</li>
                     </ul>
                     <div class="warning-box">
-                        <strong><i class="fas fa-exclamation-triangle"></i> Safety First:</strong> Always inform someone of your visit schedule and location for your safety.
+                        <strong><i class="fas fa-exclamation-triangle"></i> Important Notice:</strong>
+                        <p>These terms are subject to change without notice. Current terms apply to each scheduled visit. Violations may result in legal consequences and permanent restrictions.</p>
                     </div>
                 </div>
-                
-                <div class="terms-section">
-                    <h2><i class="fas fa-money-bill-wave"></i> 3. Charges and Payments</h2>
-                    <ul>
-                        <li>Unless stated otherwise, site visits are free of charge.</li>
-                        <li>If a lister charges a fee for site visits, the amount must be disclosed clearly on the listing and agreed upon in writing before the visit.</li>
-                        <li>The platform shall not be held liable for disputes arising from offline payments not sanctioned through the platform.</li>
-                    </ul>
-                </div>
-                
-                <div class="terms-section">
-                    <h2><i class="fas fa-users"></i> 4. Code of Conduct</h2>
-                    <ul>
-                        <li>Users and Listers must behave respectfully and professionally at all times.</li>
-                        <li>Harassment, intimidation, or any form of abuse during site visits is strictly prohibited and will lead to an immediate ban and potential legal action.</li>
-                        <li>No photography, videography, or recording is allowed during site visits without prior consent from the property owner or agent.</li>
-                    </ul>
-                    <div class="highlight-box">
-                        <strong><i class="fas fa-camera"></i> Photography Policy:</strong> Always ask for permission before taking photos or videos during your visit.
-                    </div>
-                </div>
-                
-                <div class="terms-section">
-                    <h2><i class="fas fa-exclamation-circle"></i> 5. Liability Disclaimer</h2>
-                    <ul>
-                        <li>The platform is not a real estate agent and is not liable for any injuries, losses, theft, or damages occurring during site visits.</li>
-                        <li>Users are responsible for making their own judgment and are advised to conduct due diligence before making any payments or agreements.</li>
-                        <li>The platform does not guarantee the availability, condition, or authenticity of any listed property.</li>
-                    </ul>
-                    <div class="warning-box">
-                        <strong><i class="fas fa-info-circle"></i> Important:</strong> You visit properties at your own risk. Please exercise caution and common sense.
-                    </div>
-                </div>
-                
-                <div class="terms-section">
-                    <h2><i class="fas fa-clock"></i> 6. Cancellations and Rescheduling</h2>
-                    <ul>
-                        <li>Users and Listers should provide at least 4 hours' notice for cancellations or changes to scheduled site visits.</li>
-                        <li>Failure to do so may result in a strike on the user's or lister's profile.</li>
-                    </ul>
-                </div>
-                
-                <div class="terms-section">
-                    <h2><i class="fas fa-security"></i> 7. Fraud Prevention</h2>
-                    <ul>
-                        <li>All listings and site visit requests are subject to review and may be flagged or removed if suspected to be fraudulent.</li>
-                        <li>Users are advised not to pay any deposit or rent before physically visiting the property and verifying ownership.</li>
-                    </ul>
-                    <div class="warning-box">
-                        <strong><i class="fas fa-warning"></i> Fraud Alert:</strong> Never pay money upfront without visiting the property and verifying ownership documentation.
-                    </div>
-                </div>
-                
-                <div class="terms-section">
-                    <h2><i class="fas fa-edit"></i> 8. Modifications</h2>
-                    <p>The platform reserves the right to update or change these Terms and Conditions at any time. Continued use of the site following changes implies acceptance of the new terms.</p>
-                </div>
-                
+
                 <div class="acceptance-section">
-                    <h3><i class="fas fa-check-circle"></i> Agreement Required</h3>
-                    <p>You must accept these terms to schedule site visits on our platform.</p>
+                    <h3><i class="fas fa-check-circle"></i> Terms Acceptance Required</h3>
+                    <p>I have read, understood, and agree to comply with all the terms and conditions stated above for my site visit. I understand this is a legally binding agreement.</p>
+                    
                     <div class="acceptance-buttons">
                         <button class="btn-accept" onclick="acceptTerms()">
                             <i class="fas fa-check"></i> I Accept These Terms
@@ -343,16 +661,28 @@
                         </button>
                     </div>
                 </div>
-                
+
                 <div class="last-updated">
-                    <p><i class="fas fa-calendar"></i> Last updated: July 24, 2025</p>
+                    <p><i class="fas fa-calendar-alt"></i> Last Updated: December 2024 | <i class="fas fa-shield-alt"></i> Your privacy and safety are our top priorities</p>
                 </div>
             </div>
         </div>
     </div>
-    
+
     <script src="js/auth.js"></script>
     <script>
+        // Scroll progress bar functionality
+        function updateScrollProgress() {
+            const scrollProgress = document.getElementById('scrollProgressBar');
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollTop / scrollHeight) * 100;
+            scrollProgress.style.width = progress + '%';
+        }
+
+        window.addEventListener('scroll', updateScrollProgress);
+        window.addEventListener('resize', updateScrollProgress);
+
         function acceptTerms() {
             // Store acceptance in localStorage
             localStorage.setItem('siteVisitTermsAccepted', 'true');
@@ -388,26 +718,46 @@
         }
         
         function showNotification(message, type = 'info') {
-            // Simple notification function
+            // Create modern notification
             const notification = document.createElement('div');
             notification.style.cssText = `
                 position: fixed;
-                top: 20px;
-                right: 20px;
+                top: 30px;
+                right: 30px;
                 z-index: 10000;
                 max-width: 400px;
-                padding: 15px 20px;
-                border-radius: 8px;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+                padding: 20px 25px;
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                backdrop-filter: blur(10px);
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                 color: white;
-                background: ${type === 'success' ? '#28a745' : '#007bff'};
+                background: ${type === 'success' ? 'linear-gradient(135deg, #00b894, #00cec9)' : 'linear-gradient(135deg, #667eea, #764ba2)'};
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 10px;
             `;
-            notification.textContent = message;
+            
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
             document.body.appendChild(notification);
             
+            // Animate in
             setTimeout(() => {
-                notification.remove();
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // Animate out and remove
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
             }, 3000);
         }
         
@@ -423,6 +773,9 @@
                 `;
                 document.querySelector('.terms-content').insertBefore(info, document.querySelector('.terms-content').firstChild);
             }
+
+            // Initialize scroll progress
+            updateScrollProgress();
         });
     </script>
 </body>
