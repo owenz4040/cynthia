@@ -43,10 +43,11 @@ def send_otp_email(to_email, otp_code, user_name="User"):
                 .container {{ max-width: 600px; margin: 0 auto; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }}
                 .header {{ background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); padding: 30px; text-align: center; color: white; }}
                 .content {{ padding: 30px; }}
-                .otp-box {{ background: #f8f9fa; border: 2px dashed #dc2743; border-radius: 10px; padding: 20px; text-align: center; margin: 20px 0; }}
-                .otp-code {{ font-size: 32px; font-weight: bold; color: #dc2743; letter-spacing: 5px; margin: 10px 0; }}
                 .footer {{ background: #f8f9fa; padding: 20px; text-align: center; color: #666; font-size: 14px; }}
-                .button {{ display: inline-block; background: linear-gradient(45deg, #f09433, #dc2743); color: white; padding: 12px 24px; text-decoration: none; border-radius: 25px; font-weight: bold; }}
+                .button {{ display: inline-block; background: linear-gradient(45deg, #f09433, #dc2743); color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; font-weight: bold; font-size: 16px; }}
+                .button:hover {{ background: linear-gradient(45deg, #e6683c, #bc1888); }}
+                ul {{ padding-left: 20px; }}
+                li {{ margin-bottom: 8px; }}
             </style>
         </head>
         <body>
@@ -57,22 +58,17 @@ def send_otp_email(to_email, otp_code, user_name="User"):
                 </div>
                 <div class="content">
                     <h2>Hello {user_name}!</h2>
-                    <p>Thank you for registering with our Rental House Booking System. To complete your registration, please verify your email address using the OTP code below:</p>
+                    <p>Thank you for registering with our Rental House Booking System. To complete your registration, please verify your email address by clicking the button below:</p>
                     
-                    <div class="otp-box">
-                        <p><strong>Your Verification Code:</strong></p>
-                        <div class="otp-code">{otp_code}</div>
-                        <p><small>This code expires in 10 minutes</small></p>
-                    </div>
-                    <p style="text-align:center; margin:20px 0;">
+                    <p style="text-align:center; margin:30px 0;">
                         <a href="{url_for('api.verify_email_link', email=to_email, otp_code=otp_code, _external=True)}" class="button">Verify Email Now</a>
                     </p>
                     
-                    <p>Enter this code on the verification page to activate your account and start browsing amazing rental properties!</p>
+                    <p>Click the verification button above to activate your account and start browsing amazing rental properties!</p>
                     
                     <p><strong>What's next?</strong></p>
                     <ul>
-                        <li>✅ Verify your email with the code above</li>
+                        <li>✅ Click the verification button above</li>
                         <li>🏠 Browse beautiful rental properties</li>
                         <li>📱 Enjoy our Instagram-inspired interface</li>
                         <li>🔒 Secure booking and profile management</li>

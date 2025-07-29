@@ -130,14 +130,14 @@ def register_user():
                 'message': 'Registration successful, but email delivery failed.',
                 'user_id': user_id,
                 'email': data['email'],
-                'otp_sent': False,
+                'email_sent': False,
                 'verification_link': verification_link
             }), 201
         return jsonify({
-            'message': 'Registration successful! Verification email sent.',
+            'message': 'Registration successful! Verification email sent. Check your email and click the verification link.',
             'user_id': user_id,
             'email': data['email'],
-            'otp_sent': True,
+            'email_sent': True,
             'verification_link': verification_link
         }), 201
         
@@ -238,7 +238,7 @@ def resend_otp():
             return jsonify({'error': 'Failed to send verification email'}), 500
         
         return jsonify({
-            'message': 'Verification code sent successfully!'
+            'message': 'Verification email sent successfully! Check your email and click the verification link.'
         }), 200
         
     except Exception as e:

@@ -43,7 +43,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     window.location.href = result.verification_link;
                     return;
                 }
-                // Fallback: inform user to check email for code link
+                // Fallback: Show email check modal instead of auto-redirecting
+                showModal('verificationModal');
+                document.getElementById('userEmail').textContent = currentEmail;
                 showNotification('🎉 Registration successful! Please check your email and click the verification link.', 'success', 8000);
                 console.log('✅ User registered:', { email: currentEmail, name: currentUserName });
             } else {
@@ -75,74 +77,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Handle email verification
-    verificationForm.addEventListener('submit', async function(e) {
-        // Clear pending verification after successful verification
-        localStorage.removeItem('pendingEmailVerification');
-        e.preventDefault();
-        
-        const otpValue = document.getElementById('otpInput').value.trim();
-        
-        if (!otpValue || otpValue.length !== 6) {
-            showNotification('Please enter the complete 6-digit verification code.', 'warning');
-            return;
-        }
-        
-        showLoading('verifyBtn', 'Verifying...');
-        
-        try {
-            const response = await AuthUtils.apiRequest('/verify-email', {
-                method: 'POST',
-                body: JSON.stringify({ email: currentEmail, otp: otpValue })
-            });
-            
-            // Close verification modal and show success modal
-            closeModal('verificationModal');
-            showModal('successModal');
-            
-            // Enhanced verification success notification
-            showNotification(`✅ Email verified successfully! Welcome to the Rental System, ${currentUserName}! You can now sign in with your credentials.`, 'success', 8000);
-            
-            // Log successful verification
-            console.log('✅ Email verified successfully:', {
-                email: currentEmail,
-                name: currentUserName,
-                timestamp: new Date().toISOString()
-            });
-            
-            // Auto-redirect to login after 3 seconds
-            setTimeout(() => {
-                showNotification('🔄 Redirecting to login page...', 'info', 2000);
-                setTimeout(() => {
-                    window.location.href = 'login.html';
-                }, 2000);
-            }, 3000);
-            
-        } catch (error) {
-            console.error('❌ Verification error:', error);
-            
-            // Enhanced error handling for verification
-            let errorMessage = 'Verification failed. Please try again.';
-            
-            if (error.message) {
-                errorMessage = error.message;
-            } else if (error.status === 400) {
-                errorMessage = 'Invalid verification code. Please check and try again.';
-            } else if (error.status === 404) {
-                errorMessage = 'Verification code expired. Please request a new one.';
-            } else if (error.status === 429) {
-                errorMessage = 'Too many attempts. Please wait before trying again.';
-            }
-            
-            showNotification(`❌ ${errorMessage}`, 'error', 6000);
-            clearOTPInputs(otpContainer);
-        } finally {
-            hideLoading('verifyBtn');
-        }
-    });
-    
-    // Handle OTP resend
-    resendBtn.addEventListener('click', async function() {
+    // Handle resend verification email
+    document.getElementById('resendBtn').addEventListener('click', async function() {
         if (!currentEmail) {
             showNotification('No email address found. Please register again.', 'error');
             return;
@@ -157,18 +93,33 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify({ email: currentEmail })
             });
             
-            showNotification('Verification code sent successfully!', 'success');
-            clearOTPInputs(otpContainer);
+            showNotification('Verification email sent! Please check your inbox and click the verification link.', 'success');
+        } catch (error) {
+            showNotification(error.message || 'Failed to resend verification email', 'error');
+        } finally {
+    // Handle resend verification email
+    document.getElementById('resendBtn').addEventListener('click', async function() {
+        if (!currentEmail) {
+            showNotification('No email address found. Please register again.', 'error');
+            return;
+        }
+        
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+        
+        try {
+            await AuthUtils.apiRequest('/resend-otp', {
+                method: 'POST',
+                body: JSON.stringify({ email: currentEmail })
+            });
             
-            // Start countdown
-            startResendCountdown();
-            
+            showNotification('Verification email sent! Please check your inbox and click the verification link.', 'success');
         } catch (error) {
             console.error('Resend error:', error);
-            showNotification(error.message || 'Failed to send verification code.', 'error');
+            showNotification(error.message || 'Failed to send verification email.', 'error');
         } finally {
             this.disabled = false;
-            this.innerHTML = '<i class="fas fa-refresh"></i> Resend Code';
+            this.innerHTML = '<i class="fas fa-refresh"></i> Resend Email';
         }
     });
     

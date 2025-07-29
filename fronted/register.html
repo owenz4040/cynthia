@@ -106,30 +106,38 @@
     <div id="verificationModal" class="modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h3><i class="fas fa-envelope-circle-check"></i> Verify Your Email</h3>
+                <h3><i class="fas fa-envelope-circle-check"></i> Check Your Email</h3>
             </div>
             <div class="modal-body">
-                <p>We've sent a verification code to <strong id="userEmail"></strong></p>
-                <p>Please enter the 6-digit code below:</p>
+                <p>We've sent a verification link to <strong id="userEmail"></strong></p>
+                <p>Please check your email and click the verification link to activate your account.</p>
                 
-                <form id="verificationForm">
-                    <div class="form-group">
-                        <input type="text" id="otpInput" name="otp" placeholder="Enter 6-digit code" maxlength="6" required class="form-input" />
+                <div class="email-check-info">
+                    <div class="email-check-steps">
+                        <div class="step">
+                            <i class="fas fa-envelope"></i>
+                            <span>Check your inbox</span>
+                        </div>
+                        <div class="step">
+                            <i class="fas fa-mouse-pointer"></i>
+                            <span>Click the verification link</span>
+                        </div>
+                        <div class="step">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Account activated!</span>
+                        </div>
                     </div>
-                    
-                    <button type="submit" class="auth-btn" id="verifyBtn">
-                        <span class="btn-text">Verify Email</span>
-                        <span class="btn-loading" style="display: none;">
-                            <i class="fas fa-spinner fa-spin"></i> Verifying...
-                        </span>
-                    </button>
-                </form>
+                </div>
                 
                 <div class="resend-section">
-                    <p>Didn't receive the code?</p>
+                    <p>Didn't receive the email?</p>
                     <button type="button" class="resend-btn" id="resendBtn">
-                        <i class="fas fa-refresh"></i> Resend Code
+                        <i class="fas fa-refresh"></i> Resend Email
                     </button>
+                </div>
+                
+                <div class="manual-login">
+                    <p>Already verified? <a href="login.html">Go to Login</a></p>
                 </div>
             </div>
         </div>
