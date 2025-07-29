@@ -516,13 +516,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 <!-- Carousel controls -->
                 <div class="carousel-controls">
-                    <button class="carousel-btn prev-btn" onclick="featuredCarousel.previous()">
+                    <button class="carousel-btn prev-btn" data-action="previous">
                         <i class="fas fa-chevron-left"></i>
                     </button>
-                    <button class="carousel-btn next-btn" onclick="featuredCarousel.next()">
+                    <button class="carousel-btn next-btn" data-action="next">
                         <i class="fas fa-chevron-right"></i>
                     </button>
-                    <button class="carousel-btn play-pause-btn" onclick="featuredCarousel.toggleAutoPlay()">
+                    <button class="carousel-btn play-pause-btn" data-action="toggle">
                         <i class="fas fa-pause" id="playPauseIcon"></i>
                     </button>
                 </div>
@@ -530,7 +530,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <!-- Carousel indicators -->
                 <div class="carousel-indicators">
                     ${properties.map((_, index) => `
-                        <span class="indicator ${index === 0 ? 'active' : ''}" onclick="featuredCarousel.goToSlide(${index})"></span>
+                        <span class="indicator ${index === 0 ? 'active' : ''}" data-slide="${index}"></span>
                     `).join('')}
                 </div>
                 
@@ -547,8 +547,8 @@ document.addEventListener('DOMContentLoaded', function() {
         initializeFeaturedCarousel(properties.length);
     }
 
-    // Featured Properties Carousel
-    let featuredCarousel = {
+    // Featured Properties Carousel - Make it globally accessible
+    window.featuredCarousel = {
         currentSlide: 0,
         totalSlides: 0,
         autoPlayInterval: null,
@@ -581,8 +581,8 @@ document.addEventListener('DOMContentLoaded', function() {
         },
 
         updateSlides: function() {
-            const slides = document.querySelectorAll('.carousel-slide');
-            const indicators = document.querySelectorAll('.carousel-indicators .indicator');
+            const slides = document.querySelectorAll('.featured-carousel .carousel-slide');
+            const indicators = document.querySelectorAll('.featured-carousel .indicator');
             
             slides.forEach((slide, index) => {
                 slide.classList.toggle('active', index === this.currentSlide);
@@ -596,9 +596,7 @@ document.addEventListener('DOMContentLoaded', function() {
         },
 
         startAutoPlay: function() {
-            if (this.autoPlayInterval) {
-                clearInterval(this.autoPlayInterval);
-            }
+            this.stopAutoPlay(); // Clear any existing interval first
             
             if (this.isAutoPlaying && this.totalSlides > 1) {
                 this.autoPlayInterval = setInterval(() => {
@@ -616,8 +614,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         restartAutoPlay: function() {
             if (this.isAutoPlaying) {
-                this.stopAutoPlay();
-                this.startAutoPlay();
+                this.startAutoPlay(); // startAutoPlay already calls stopAutoPlay
             }
         },
 
@@ -644,17 +641,51 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     function initializeFeaturedCarousel(slideCount) {
-        featuredCarousel.init(slideCount);
+        window.featuredCarousel.init(slideCount);
+        
+        // Add click handlers for carousel controls
+        const carouselControls = document.querySelector('.carousel-controls');
+        if (carouselControls) {
+            carouselControls.addEventListener('click', function(e) {
+                const button = e.target.closest('button[data-action]');
+                if (button) {
+                    const action = button.dataset.action;
+                    switch(action) {
+                        case 'previous':
+                            window.featuredCarousel.previous();
+                            break;
+                        case 'next':
+                            window.featuredCarousel.next();
+                            break;
+                        case 'toggle':
+                            window.featuredCarousel.toggleAutoPlay();
+                            break;
+                    }
+                }
+            });
+        }
+        
+        // Add click handlers for indicators
+        const indicators = document.querySelector('.carousel-indicators');
+        if (indicators) {
+            indicators.addEventListener('click', function(e) {
+                const indicator = e.target.closest('.indicator[data-slide]');
+                if (indicator) {
+                    const slideIndex = parseInt(indicator.dataset.slide);
+                    window.featuredCarousel.goToSlide(slideIndex);
+                }
+            });
+        }
         
         // Add keyboard navigation
         document.addEventListener('keydown', function(e) {
             if (e.key === 'ArrowLeft') {
-                featuredCarousel.previous();
+                window.featuredCarousel.previous();
             } else if (e.key === 'ArrowRight') {
-                featuredCarousel.next();
+                window.featuredCarousel.next();
             } else if (e.key === ' ') {
                 e.preventDefault();
-                featuredCarousel.toggleAutoPlay();
+                window.featuredCarousel.toggleAutoPlay();
             }
         });
 
@@ -662,12 +693,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const carouselContainer = document.querySelector('.featured-carousel');
         if (carouselContainer) {
             carouselContainer.addEventListener('mouseenter', () => {
-                featuredCarousel.stopAutoPlay();
+                window.featuredCarousel.stopAutoPlay();
             });
             
             carouselContainer.addEventListener('mouseleave', () => {
-                if (featuredCarousel.isAutoPlaying) {
-                    featuredCarousel.startAutoPlay();
+                if (window.featuredCarousel.isAutoPlaying) {
+                    window.featuredCarousel.startAutoPlay();
                 }
             });
         }
