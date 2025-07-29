@@ -1,4 +1,4 @@
-﻿// Registration page functionality
+// Registration page functionality
 document.addEventListener('DOMContentLoaded', function() {
     const registerForm = document.getElementById('registerForm');
     const verificationModal = document.getElementById('verificationModal');
@@ -348,4 +348,4 @@ document.addEventListener('DOMContentLoaded', function() {
         strengthElement.textContent = `Password Strength: ${strength.label}`;
         strengthElement.style.color = strength.color;
     }
-})();
+});
