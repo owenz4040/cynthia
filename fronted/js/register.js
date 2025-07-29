@@ -37,17 +37,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 currentUserName = data.name;
                 // Store pending verification
                 localStorage.setItem('pendingEmailVerification', currentEmail);
-                // If backend provided a verification link, open it directly
-                if (result.verification_link) {
-                    showNotification('🎉 Registration successful! Opening verification link...', 'success', 3000);
-                    window.location.href = result.verification_link;
-                    return;
-                }
-                // Fallback: Show email check modal instead of auto-redirecting
+                // Show email check modal - user must click verification link in email
                 showModal('verificationModal');
                 document.getElementById('userEmail').textContent = currentEmail;
-                showNotification('🎉 Registration successful! Please check your email and click the verification link.', 'success', 8000);
+                showNotification('🎉 Registration successful! Please check your email and click the verification link to complete registration.', 'success', 8000);
                 console.log('✅ User registered:', { email: currentEmail, name: currentUserName });
+                console.log('📧 Verification email sent - waiting for user to click link');
             } else {
                 // Show error message
                 let msg = result.error || 'Registration failed. Please try again.';
@@ -348,4 +343,4 @@ document.addEventListener('DOMContentLoaded', function() {
         strengthElement.textContent = `Password Strength: ${strength.label}`;
         strengthElement.style.color = strength.color;
     }
-})();
+});

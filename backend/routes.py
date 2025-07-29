@@ -123,7 +123,7 @@ def register_user():
         otp_code = OTPModel.create_otp(data['email'])
         verification_link = url_for('api.verify_email_link', email=data['email'], otp_code=otp_code, _external=True)
         # Send OTP email (with link)
-        email_sent = send_otp_email(data['email'], otp_code, data['name'])
+        email_sent = send_otp_email(data['email'], otp_code, data['name'], verification_link)
         # Respond with link regardless of email success
         if not email_sent:
             return jsonify({
@@ -232,7 +232,8 @@ def resend_otp():
         
         # Generate and send new OTP
         otp_code = OTPModel.create_otp(data['email'])
-        email_sent = send_otp_email(data['email'], otp_code, user['name'])
+        verification_link = url_for('api.verify_email_link', email=data['email'], otp_code=otp_code, _external=True)
+        email_sent = send_otp_email(data['email'], otp_code, user['name'], verification_link)
         
         if not email_sent:
             return jsonify({'error': 'Failed to send verification email'}), 500

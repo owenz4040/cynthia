@@ -8,7 +8,7 @@ from email.mime.multipart import MIMEMultipart
 from flask import current_app, url_for
 import os
 
-def send_otp_email(to_email, otp_code, user_name="User"):
+def send_otp_email(to_email, otp_code, user_name="User", verification_link=None):
     """Send OTP verification email."""
     try:
         # Email configuration
@@ -61,7 +61,7 @@ def send_otp_email(to_email, otp_code, user_name="User"):
                     <p>Thank you for registering with our Rental House Booking System. To complete your registration, please verify your email address by clicking the button below:</p>
                     
                     <p style="text-align:center; margin:30px 0;">
-                        <a href="{url_for('api.verify_email_link', email=to_email, otp_code=otp_code, _external=True)}" class="button">Verify Email Now</a>
+                        <a href="{verification_link or url_for('api.verify_email_link', email=to_email, otp_code=otp_code, _external=True)}" class="button">Verify Email Now</a>
                     </p>
                     
                     <p>Click the verification button above to activate your account and start browsing amazing rental properties!</p>
@@ -84,6 +84,9 @@ def send_otp_email(to_email, otp_code, user_name="User"):
         </body>
         </html>
         """
+        
+        # Debug: Print the verification link being used
+        print(f"📧 Verification link in email: {verification_link or url_for('api.verify_email_link', email=to_email, otp_code=otp_code, _external=True)}")
         
         msg.attach(MIMEText(html_body, 'html'))
         
