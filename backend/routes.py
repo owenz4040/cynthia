@@ -1073,15 +1073,24 @@ def get_user_bookings():
         # Format bookings for response
         formatted_bookings = []
         for booking in bookings:
-            booking_dict = BookingModel.to_dict(booking)
-            booking_dict['house'] = {
-                'id': str(booking['house']['_id']),
-                'name': booking['house']['name'],
-                'location': booking['house']['location'],
-                'price_per_month': booking['house']['price_per_month'],
-                'images': booking['house'].get('images', [])
-            }
-            formatted_bookings.append(booking_dict)
+            try:
+                booking_dict = BookingModel.to_dict(booking)
+                
+                # Safely get house data
+                house_data = booking.get('house', {})
+                booking_dict['house'] = {
+                    'id': str(house_data.get('_id', '')),
+                    'name': house_data.get('name', 'Unknown Property'),
+                    'location': house_data.get('location', 'Unknown Location'),
+                    'price_per_month': house_data.get('price_per_month', 0),
+                    'images': house_data.get('images', [])
+                }
+                
+                formatted_bookings.append(booking_dict)
+            except Exception as booking_error:
+                print(f"Error formatting user booking {booking.get('_id', 'unknown')}: {booking_error}")
+                # Continue with other bookings instead of failing completely
+                continue
         
         return jsonify({
             'bookings': formatted_bookings,
@@ -1173,20 +1182,32 @@ def get_all_bookings(current_admin):
         # Format bookings for response
         formatted_bookings = []
         for booking in bookings:
-            booking_dict = BookingModel.to_dict(booking)
-            booking_dict['house'] = {
-                'id': str(booking['house']['_id']),
-                'name': booking['house']['name'],
-                'location': booking['house']['location'],
-                'price_per_month': booking['house']['price_per_month'],
-                'images': booking['house'].get('images', [])
-            }
-            booking_dict['user'] = {
-                'id': str(booking['user']['_id']),
-                'name': booking['user']['name'],
-                'email': booking['user']['email']
-            }
-            formatted_bookings.append(booking_dict)
+            try:
+                booking_dict = BookingModel.to_dict(booking)
+                
+                # Safely get house data
+                house_data = booking.get('house', {})
+                booking_dict['house'] = {
+                    'id': str(house_data.get('_id', '')),
+                    'name': house_data.get('name', 'Unknown Property'),
+                    'location': house_data.get('location', 'Unknown Location'),
+                    'price_per_month': house_data.get('price_per_month', 0),
+                    'images': house_data.get('images', [])
+                }
+                
+                # Safely get user data
+                user_data = booking.get('user', {})
+                booking_dict['user'] = {
+                    'id': str(user_data.get('_id', '')),
+                    'name': user_data.get('name', 'Unknown User'),
+                    'email': user_data.get('email', 'Unknown Email')
+                }
+                
+                formatted_bookings.append(booking_dict)
+            except Exception as booking_error:
+                print(f"Error formatting booking {booking.get('_id', 'unknown')}: {booking_error}")
+                # Continue with other bookings instead of failing completely
+                continue
         
         return jsonify({
             'bookings': formatted_bookings,
