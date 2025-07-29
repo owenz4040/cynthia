@@ -10,6 +10,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const errorMessage = document.getElementById('errorMessage');
     const emailInput = document.getElementById('email');
 
+    // Get API base URL from config
+    const API_BASE = window.Config ? window.Config.API_BASE : 'http://localhost:5000/api';
+
     // Form submission
     form.addEventListener('submit', handleForgotPassword);
 
@@ -39,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
         clearMessages();
 
         try {
-            const response = await fetch(`${API_BASE_URL}/forgot-password`, {
+            const response = await fetch(`${API_BASE}/forgot-password`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

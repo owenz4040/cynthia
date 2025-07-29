@@ -16,6 +16,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const welcomeText = document.getElementById('welcomeText');
     const authLinks = document.getElementById('authLinks');
 
+    // Get API base URL from config
+    const API_BASE = window.Config ? window.Config.API_BASE : 'http://localhost:5000/api';
+
     let resetToken = '';
     let userEmail = '';
 
@@ -40,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function verifyResetToken() {
         try {
-            const response = await fetch(`${API_BASE_URL}/verify-reset-token`, {
+            const response = await fetch(`${API_BASE}/verify-reset-token`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -99,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setLoading(true);
 
         try {
-            const response = await fetch(`${API_BASE_URL}/reset-password`, {
+            const response = await fetch(`${API_BASE}/reset-password`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
