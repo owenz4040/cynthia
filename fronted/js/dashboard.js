@@ -553,7 +553,7 @@ document.addEventListener('DOMContentLoaded', function() {
         totalSlides: 0,
         autoPlayInterval: null,
         isAutoPlaying: true,
-        autoPlayDelay: 4000, // 4 seconds
+        autoPlayDelay: 2000, // 2 seconds
 
         init: function(slideCount) {
             this.totalSlides = slideCount;
