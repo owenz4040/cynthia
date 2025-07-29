@@ -221,7 +221,7 @@
                 
                 // Auto-fill first house ID if available
                 if (result.houses && result.houses.length > 0) {
-                    document.getElementById('testHouseId').value = result.houses[0]._id;
+                    document.getElementById('testHouseId').value = result.houses[0].id;
                 }
             } catch (error) {
                 showResult('housesResult', `❌ Houses loading failed: ${error.message}`, 'error');

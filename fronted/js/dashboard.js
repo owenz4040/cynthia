@@ -477,7 +477,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="carousel-container">
                     <div class="carousel-track" id="featuredCarouselTrack">
                         ${properties.map((property, index) => `
-                            <div class="property-card carousel-slide ${index === 0 ? 'active' : ''}" onclick="viewProperty('${property._id}')">
+                            <div class="property-card carousel-slide ${index === 0 ? 'active' : ''}" onclick="viewProperty('${property.id}')">
                                 <div class="property-image">
                                     <img src="${property.images && property.images[0] ? property.images[0].image_url : 'https://via.placeholder.com/300x200'}" 
                                          alt="${property.name}" 
@@ -501,10 +501,10 @@ document.addEventListener('DOMContentLoaded', function() {
                                         </span>
                                     </div>
                                     <div class="property-actions">
-                                        <button class="btn-primary" onclick="event.stopPropagation(); bookProperty('${property._id}')">
+                                        <button class="btn-primary" onclick="event.stopPropagation(); bookProperty('${property.id}')">
                                             Book Now
                                         </button>
-                                        <button class="btn-heart" onclick="event.stopPropagation(); toggleFavorite('${property._id}')">
+                                        <button class="btn-heart" onclick="event.stopPropagation(); toggleFavorite('${property.id}')">
                                             <i class="fas fa-heart"></i>
                                         </button>
                                     </div>
@@ -914,7 +914,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         const html = properties.map(property => `
-            <div class="property-card" onclick="viewProperty('${property._id}')">
+            <div class="property-card" onclick="viewProperty('${property.id}')">
                 <div class="property-image">
                     <img src="${property.images && property.images[0] ? property.images[0].image_url : 'https://via.placeholder.com/300x200'}" 
                          alt="${property.name}"
@@ -938,10 +938,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         </span>
                     </div>
                     <div class="property-actions">
-                        <button class="btn-primary" onclick="event.stopPropagation(); bookProperty('${property._id}')">
+                        <button class="btn-primary" onclick="event.stopPropagation(); bookProperty('${property.id}')">
                             Book Now
                         </button>
-                        <button class="btn-heart" onclick="event.stopPropagation(); toggleFavorite('${property._id}')">
+                        <button class="btn-heart" onclick="event.stopPropagation(); toggleFavorite('${property.id}')">
                             <i class="fas fa-heart"></i>
                         </button>
                     </div>
@@ -1084,6 +1084,12 @@ function scheduleReview(propertyId) {
     console.log('Scheduling review for property:', propertyId);
     console.trace('scheduleReview called from:'); // Add stack trace to see where this is called from
     
+    // Validate propertyId first
+    if (!propertyId || propertyId === 'undefined' || propertyId === 'null') {
+        showNotification('Property ID is missing. Please try selecting the property again.', 'error');
+        return;
+    }
+    
     // Check if user has accepted site visit terms
     if (!AuthUtils.hasSiteVisitTermsAccepted()) {
         if (confirm('You need to accept our Site Visit Terms & Conditions before scheduling a property visit. Would you like to review them now?')) {
@@ -1146,7 +1152,7 @@ function getCurrentProperty(propertyId) {
             // Extract property data from the card (this is a workaround)
             // In a real implementation, you'd fetch from API or store in a data structure
             return {
-                _id: propertyId,
+                id: propertyId,
                 name: card.querySelector('.property-title')?.textContent || 'Property',
                 location: card.querySelector('.property-location')?.textContent?.replace('📍', '').trim() || 'Location',
                 price_per_month: card.querySelector('.property-price')?.textContent?.match(/\d+/)?.[0] || '0',
@@ -1197,8 +1203,8 @@ async function handleBookingSubmit(e) {
         const formData = new FormData(e.target);
         const propertyId = e.target.dataset.propertyId;
         
-        if (!propertyId) {
-            throw new Error('Property ID is missing');
+        if (!propertyId || propertyId === 'undefined' || propertyId === 'null') {
+            throw new Error('Property ID is missing. Please close this modal and try selecting the property again.');
         }
         
         const bookingData = {
@@ -1215,7 +1221,11 @@ async function handleBookingSubmit(e) {
             throw new Error('Please select both a preferred date and time');
         }
         
-        console.log('Submitting booking data:', bookingData);
+        console.log('Submitting booking data:', {
+            ...bookingData,
+            house_id_type: typeof bookingData.house_id,
+            house_id_value: bookingData.house_id
+        });
         
         const result = await AuthUtils.apiRequest('/bookings', {
             method: 'POST',
@@ -1487,6 +1497,12 @@ async function cancelBooking(bookingId) {
 }
 
 function bookProperty(propertyId) {
+    // Validate propertyId first
+    if (!propertyId || propertyId === 'undefined' || propertyId === 'null') {
+        showNotification('Property ID is missing. Please try selecting the property again.', 'error');
+        return;
+    }
+    
     // Check if user has accepted site visit terms
     if (!AuthUtils.hasSiteVisitTermsAccepted()) {
         if (confirm('You need to accept our Site Visit Terms & Conditions before scheduling a property visit. Would you like to review them now?')) {

@@ -1351,6 +1351,19 @@ def create_booking():
         if not is_valid:
             return jsonify({'error': error_message}), 400
         
+        # Additional validation for house_id
+        house_id = data['house_id']
+        if not house_id or house_id == 'undefined' or house_id == 'null':
+            return jsonify({'error': 'Property ID is required and cannot be undefined'}), 400
+        
+        # Validate ObjectId format
+        try:
+            from bson import ObjectId
+            if not ObjectId.is_valid(house_id):
+                return jsonify({'error': 'Invalid property ID format'}), 400
+        except Exception:
+            return jsonify({'error': 'Invalid property ID format'}), 400
+        
         # Validate house exists and is available
         house = HouseModel.find_by_id(data['house_id'])
         if not house:
