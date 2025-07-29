@@ -4,7 +4,7 @@ from models import AdminModel, HouseModel, UserModel, OTPModel, BookingModel, mo
 from auth import admin_required, validate_admin_credentials, validate_required_fields
 from image_utils import upload_image_to_cloudinary, delete_image_from_cloudinary, allowed_file
 from urllib.parse import quote, unquote
-from email_utils import send_otp_email, send_welcome_email, send_booking_receipt_email, send_booking_update_email
+from email_utils import send_otp_email, send_welcome_email, send_booking_receipt_email, send_booking_update_email, send_password_reset_email
 from chatbot import chatbot
 from bson import ObjectId
 import uuid
@@ -368,6 +368,342 @@ def login_user():
         
     except Exception as e:
         return jsonify({'error': f'Login failed: {str(e)}'}), 500
+
+@api.route('/forgot-password', methods=['POST'])
+def forgot_password():
+    """Send password reset email to user."""
+    try:
+        data = request.get_json()
+        
+        if not data or 'email' not in data:
+            return jsonify({'error': 'Email is required'}), 400
+        
+        email = data['email'].strip().lower()
+        if not email:
+            return jsonify({'error': 'Email cannot be empty'}), 400
+        
+        # Check if user exists
+        user = UserModel.find_by_email(email)
+        if not user:
+            # Don't reveal if email exists or not for security reasons
+            return jsonify({
+                'message': 'If an account with this email exists, you will receive a password reset link shortly.',
+                'email': email
+            }), 200
+        
+        # Check if email is verified
+        if not user.get('is_verified', False):
+            return jsonify({
+                'error': 'Your email is not verified. Please verify your email first before resetting your password.',
+                'requires_verification': True
+            }), 400
+        
+        # Generate password reset token using OTP system
+        reset_token = OTPModel.create_otp(email, otp_type='password_reset')
+        
+        # Send password reset email
+        email_sent = send_password_reset_email(email, reset_token, user['name'])
+        
+        if not email_sent:
+            return jsonify({'error': 'Failed to send password reset email. Please try again later.'}), 500
+        
+        return jsonify({
+            'message': 'Password reset email sent successfully! Check your inbox and follow the instructions.',
+            'email': email
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Failed to process password reset request: {str(e)}'}), 500
+
+@api.route('/reset-password', methods=['POST'])
+def reset_password():
+    """Reset user password using token from email."""
+    try:
+        data = request.get_json()
+        
+        required_fields = ['email', 'token', 'new_password', 'confirm_password']
+        is_valid, error_message = validate_required_fields(data, required_fields)
+        if not is_valid:
+            return jsonify({'error': error_message}), 400
+        
+        email = data['email'].strip().lower()
+        token = data['token'].strip()
+        new_password = data['new_password']
+        confirm_password = data['confirm_password']
+        
+        # Validate password confirmation
+        if new_password != confirm_password:
+            return jsonify({'error': 'Passwords do not match'}), 400
+        
+        # Validate password strength
+        if len(new_password) < 8:
+            return jsonify({'error': 'Password must be at least 8 characters long'}), 400
+        
+        # Check if user exists
+        user = UserModel.find_by_email(email)
+        if not user:
+            return jsonify({'error': 'Invalid reset request'}), 400
+        
+        # Verify reset token
+        is_valid_token = OTPModel.verify_otp(email, token, otp_type='password_reset')
+        if not is_valid_token:
+            return jsonify({'error': 'Invalid or expired reset token. Please request a new password reset.'}), 400
+        
+        # Update user password
+        password_hash = UserModel.hash_password(new_password)
+        print(f"🔐 Updating password for user: {user['email']}")
+        print(f"🔐 Old password hash (first 20 chars): {user.get('password_hash', 'N/A')[:20]}...")
+        print(f"🔐 New password hash (first 20 chars): {password_hash[:20]}...")
+        
+        update_result = UserModel.update_user(str(user['_id']), {'password_hash': password_hash})
+        
+        if not update_result:
+            print(f"❌ Failed to update password in database for user: {user['email']}")
+            return jsonify({'error': 'Failed to update password. Please try again.'}), 500
+        
+        # Verify the password was actually updated
+        updated_user = UserModel.find_by_id(str(user['_id']))
+        if updated_user and updated_user.get('password_hash') == password_hash:
+            print(f"✅ Password successfully updated in MongoDB for user: {user['email']}")
+        else:
+            print(f"⚠️ Password update verification failed for user: {user['email']}")
+            return jsonify({'error': 'Password update verification failed. Please try again.'}), 500
+        
+        # Clean up expired OTPs
+        OTPModel.cleanup_expired_otps()
+        
+        return jsonify({
+            'message': 'Password reset successfully! You can now login with your new password.',
+            'success': True
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Failed to reset password: {str(e)}'}), 500
+
+@api.route('/verify-reset-token', methods=['POST'])
+def verify_reset_token():
+    """Verify if a password reset token is valid (for frontend validation)."""
+    try:
+        data = request.get_json()
+        
+        if not data or 'email' not in data or 'token' not in data:
+            return jsonify({'error': 'Email and token are required'}), 400
+        
+        email = data['email'].strip().lower()
+        token = data['token'].strip()
+        
+        # Check if user exists
+        user = UserModel.find_by_email(email)
+        if not user:
+            return jsonify({'valid': False, 'error': 'Invalid reset request'}), 400
+        
+        # Verify token without marking it as used
+        otp_record = mongo.db.otps.find_one({
+            'email': email,
+            'otp_code': token,
+            'otp_type': 'password_reset',
+            'is_used': False,
+            'expires_at': {'$gt': datetime.utcnow()}
+        })
+        
+        if otp_record:
+            return jsonify({
+                'valid': True,
+                'user_name': user['name'],
+                'email': email
+            }), 200
+        else:
+            return jsonify({
+                'valid': False,
+                'error': 'Invalid or expired reset token'
+            }), 400
+        
+    except Exception as e:
+        return jsonify({'error': f'Failed to verify token: {str(e)}'}), 500
+
+@api.route('/debug/test-password-update', methods=['POST'])
+def debug_test_password_update():
+    """Debug route to test password update functionality."""
+    try:
+        data = request.get_json()
+        
+        if not data or 'email' not in data or 'new_password' not in data:
+            return jsonify({'error': 'Email and new_password are required'}), 400
+        
+        email = data['email'].strip().lower()
+        new_password = data['new_password']
+        
+        # Find user
+        user = UserModel.find_by_email(email)
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        
+        # Get old password hash
+        old_password_hash = user.get('password_hash', 'N/A')
+        
+        # Hash new password
+        new_password_hash = UserModel.hash_password(new_password)
+        
+        # Update password
+        update_result = UserModel.update_user(str(user['_id']), {'password_hash': new_password_hash})
+        
+        # Verify update
+        updated_user = UserModel.find_by_id(str(user['_id']))
+        verification_success = updated_user and updated_user.get('password_hash') == new_password_hash
+        
+        return jsonify({
+            'success': True,
+            'user_email': email,
+            'user_id': str(user['_id']),
+            'old_hash_preview': old_password_hash[:20] + '...' if old_password_hash else 'N/A',
+            'new_hash_preview': new_password_hash[:20] + '...',
+            'update_result': update_result,
+            'verification_success': verification_success,
+            'updated_at': updated_user.get('updated_at').isoformat() if updated_user.get('updated_at') else 'N/A',
+            'message': 'Password update test completed'
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Debug test failed: {str(e)}'}), 500
+
+@api.route('/debug/test-password-login', methods=['POST'])
+def debug_test_password_login():
+    """Debug route to test if updated password works for login."""
+    try:
+        data = request.get_json()
+        
+        if not data or 'email' not in data or 'password' not in data:
+            return jsonify({'error': 'Email and password are required'}), 400
+        
+        email = data['email'].strip().lower()
+        password = data['password']
+        
+        # Find user
+        user = UserModel.find_by_email(email)
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        
+        # Check password
+        password_valid = UserModel.check_password(password, user['password_hash'])
+        
+        return jsonify({
+            'success': True,
+            'user_email': email,
+            'user_id': str(user['_id']),
+            'password_valid': password_valid,
+            'hash_preview': user['password_hash'][:20] + '...',
+            'message': 'Password check completed'
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Debug test failed: {str(e)}'}), 500
+
+@api.route('/debug/full-password-reset-test', methods=['POST'])
+def debug_full_password_reset_test():
+    """Debug route to test the complete password reset flow."""
+    try:
+        data = request.get_json()
+        
+        if not data or 'email' not in data or 'new_password' not in data:
+            return jsonify({'error': 'Email and new_password are required'}), 400
+        
+        email = data['email'].strip().lower()
+        new_password = data['new_password']
+        test_steps = []
+        
+        # Step 1: Find user
+        user = UserModel.find_by_email(email)
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        
+        test_steps.append({
+            'step': 1,
+            'description': 'Find user',
+            'success': True,
+            'data': {'user_id': str(user['_id']), 'email': user['email']}
+        })
+        
+        # Step 2: Generate reset token
+        reset_token = OTPModel.create_otp(email, otp_type='password_reset')
+        test_steps.append({
+            'step': 2,
+            'description': 'Generate reset token',
+            'success': True,
+            'data': {'token': reset_token}
+        })
+        
+        # Step 3: Verify token
+        token_valid = OTPModel.verify_otp(email, reset_token, otp_type='password_reset')
+        test_steps.append({
+            'step': 3,
+            'description': 'Verify reset token',
+            'success': token_valid,
+            'data': {'token_valid': token_valid}
+        })
+        
+        if not token_valid:
+            return jsonify({
+                'success': False,
+                'error': 'Token verification failed',
+                'test_steps': test_steps
+            }), 400
+        
+        # Step 4: Hash new password
+        old_password_hash = user.get('password_hash')
+        new_password_hash = UserModel.hash_password(new_password)
+        test_steps.append({
+            'step': 4,
+            'description': 'Hash new password',
+            'success': True,
+            'data': {
+                'old_hash_preview': old_password_hash[:20] + '...' if old_password_hash else 'N/A',
+                'new_hash_preview': new_password_hash[:20] + '...'
+            }
+        })
+        
+        # Step 5: Update password in database
+        update_result = UserModel.update_user(str(user['_id']), {'password_hash': new_password_hash})
+        test_steps.append({
+            'step': 5,
+            'description': 'Update password in MongoDB',
+            'success': update_result,
+            'data': {'update_result': update_result}
+        })
+        
+        # Step 6: Verify password was updated
+        updated_user = UserModel.find_by_id(str(user['_id']))
+        password_updated = updated_user and updated_user.get('password_hash') == new_password_hash
+        test_steps.append({
+            'step': 6,
+            'description': 'Verify password was updated',
+            'success': password_updated,
+            'data': {'password_updated': password_updated}
+        })
+        
+        # Step 7: Test login with new password
+        login_success = UserModel.check_password(new_password, updated_user['password_hash'])
+        test_steps.append({
+            'step': 7,
+            'description': 'Test login with new password',
+            'success': login_success,
+            'data': {'login_success': login_success}
+        })
+        
+        overall_success = all(step['success'] for step in test_steps)
+        
+        return jsonify({
+            'success': overall_success,
+            'message': 'Complete password reset test completed',
+            'test_steps': test_steps,
+            'final_status': {
+                'user_email': email,
+                'password_reset_successful': overall_success,
+                'can_login_with_new_password': login_success
+            }
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Full test failed: {str(e)}'}), 500
 
 @api.route('/accept-terms', methods=['POST'])
 @jwt_required()

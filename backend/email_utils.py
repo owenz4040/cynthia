@@ -429,3 +429,113 @@ def send_booking_update_email(user_email, user_name, house_name, status, admin_n
     except Exception as e:
         print(f"❌ Failed to send booking update email: {str(e)}")
         return False
+
+def send_password_reset_email(to_email, reset_token, user_name="User"):
+    """Send password reset email with secure reset link."""
+    try:
+        # Email configuration
+        smtp_server = current_app.config.get('SMTP_SERVER', 'smtp.gmail.com')
+        smtp_port = current_app.config.get('SMTP_PORT', 587)
+        smtp_username = current_app.config.get('SMTP_USERNAME')
+        smtp_password = current_app.config.get('SMTP_PASSWORD')
+        
+        if not smtp_username or not smtp_password:
+            print("❌ SMTP credentials not configured for password reset")
+            return False
+        
+        # Create reset link (will be handled by frontend)
+        reset_link = f"https://cynthia-frontend.onrender.com/reset-password.html?token={reset_token}&email={quote(to_email)}"
+        
+        # Create message
+        msg = MIMEMultipart()
+        msg['From'] = smtp_username
+        msg['To'] = to_email
+        msg['Subject'] = "🔐 Reset Your Password - Rental System"
+        
+        # HTML email body
+        html_body = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }}
+                .container {{ max-width: 600px; margin: 0 auto; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }}
+                .header {{ background: linear-gradient(45deg, #dc2743 0%, #cc2366 50%, #bc1888 100%); padding: 30px; text-align: center; color: white; }}
+                .content {{ padding: 30px; }}
+                .footer {{ background: #f8f9fa; padding: 20px; text-align: center; color: #666; font-size: 14px; }}
+                .button {{ display: inline-block; background: linear-gradient(45deg, #dc2743, #bc1888); color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; font-weight: bold; font-size: 16px; margin: 20px 0; }}
+                .button:hover {{ background: linear-gradient(45deg, #bc1888, #a91e7a); }}
+                .warning {{ background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 8px; margin: 20px 0; color: #856404; }}
+                .code {{ background: #f8f9fa; padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 18px; text-align: center; margin: 20px 0; border: 2px dashed #dee2e6; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>🔐 Password Reset Request</h1>
+                    <p>Rental Property Management System</p>
+                </div>
+                
+                <div class="content">
+                    <h2>Hello {user_name}!</h2>
+                    
+                    <p>We received a request to reset your password for your Rental System account.</p>
+                    
+                    <div class="warning">
+                        <strong>⚠️ Security Notice:</strong> If you didn't request this password reset, please ignore this email. Your account is still secure.
+                    </div>
+                    
+                    <p>To reset your password, click the button below:</p>
+                    
+                    <div style="text-align: center;">
+                        <a href="{reset_link}" class="button">🔐 Reset My Password</a>
+                    </div>
+                    
+                    <p>Or copy and paste this link into your browser:</p>
+                    <div class="code">{reset_link}</div>
+                    
+                    <div class="warning">
+                        <strong>⏰ Important:</strong> This password reset link will expire in 1 hour for security reasons.
+                    </div>
+                    
+                    <p><strong>What happens next?</strong></p>
+                    <ul>
+                        <li>Click the reset link above</li>
+                        <li>You'll be taken to a secure page to create a new password</li>
+                        <li>Enter your new password (minimum 8 characters)</li>
+                        <li>Your password will be updated and you can login with the new password</li>
+                    </ul>
+                    
+                    <p>If you have any issues, please contact our support team.</p>
+                    
+                    <p>Best regards,<br>
+                    The Rental System Team</p>
+                </div>
+                
+                <div class="footer">
+                    <p>🏠 <strong>Rental Property Management System</strong></p>
+                    <p>This is an automated message. Please do not reply to this email.</p>
+                    <p>© 2024 Rental System. All rights reserved.</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        
+        # Attach HTML body
+        msg.attach(MIMEText(html_body, 'html'))
+        
+        # Send email
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        server.login(smtp_username, smtp_password)
+        text = msg.as_string()
+        server.sendmail(smtp_username, to_email, text)
+        server.quit()
+        
+        print(f"✅ Password reset email sent to {to_email}")
+        return True
+        
+    except Exception as e:
+        print(f"❌ Failed to send password reset email: {str(e)}")
+        return False

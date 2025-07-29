@@ -44,11 +44,16 @@ class UserModel:
     def update_user(user_id, update_data):
         """Update user data."""
         update_data['updated_at'] = datetime.utcnow()
+        print(f"📝 Updating user {user_id} with data: {list(update_data.keys())}")
+        
         result = mongo.db.users.update_one(
             {'_id': ObjectId(user_id)},
             {'$set': update_data}
         )
-        return result.modified_count > 0
+        
+        success = result.modified_count > 0
+        print(f"📝 Update result - matched: {result.matched_count}, modified: {result.modified_count}, success: {success}")
+        return success
     
     @staticmethod
     def verify_user(user_id):
