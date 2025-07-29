@@ -3,6 +3,7 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from models import AdminModel, HouseModel, UserModel, OTPModel, BookingModel, mongo
 from auth import admin_required, validate_admin_credentials, validate_required_fields
 from image_utils import upload_image_to_cloudinary, delete_image_from_cloudinary, allowed_file
+from urllib.parse import quote, unquote
 from email_utils import send_otp_email, send_welcome_email, send_booking_receipt_email, send_booking_update_email
 from chatbot import chatbot
 from bson import ObjectId
@@ -122,6 +123,7 @@ def register_user():
         # Generate OTP and create verification link
         otp_code = OTPModel.create_otp(data['email'])
         verification_link = url_for('api.verify_email_link', email=data['email'], otp_code=otp_code, _external=True)
+        print(f"📧 Generated verification link: {verification_link}")
         # Send OTP email (with link)
         email_sent = send_otp_email(data['email'], otp_code, data['name'], verification_link)
         # Respond with link regardless of email success
@@ -182,20 +184,52 @@ def verify_email():
     except Exception as e:
         return jsonify({'error': f'Verification failed: {str(e)}'}), 500
 
-@api.route('/verify-email/<email>/<otp_code>', methods=['GET'])
+@api.route('/verify-email/<path:email>/<otp_code>', methods=['GET'])
 def verify_email_link(email, otp_code):
     """Verify user email via link click."""
     try:
-        # Verify OTP
-        is_valid = OTPModel.verify_otp(email, otp_code)
+        # Try both original and URL decoded email
+        emails_to_try = [email, unquote(email)]
+        
+        print(f"🔍 Verification attempt:")
+        print(f"   Raw Email: {email}")
+        print(f"   Emails to try: {emails_to_try}")
+        print(f"   OTP Code: {otp_code}")
+        
+        is_valid = False
+        verified_email = None
+        
+        # Try verification with different email formats
+        for email_variant in emails_to_try:
+            print(f"   Trying email: {email_variant}")
+            is_valid = OTPModel.verify_otp(email_variant, otp_code)
+            if is_valid:
+                verified_email = email_variant
+                print(f"   ✅ Success with email: {email_variant}")
+                break
+            else:
+                print(f"   ❌ Failed with email: {email_variant}")
+        
         if not is_valid:
-            return ("<h1>Invalid or expired verification link.</h1>"), 400
+            print("❌ Invalid or expired verification link")
+            return ("""
+            <!DOCTYPE html>
+            <html>
+            <head><title>Verification Failed</title></head>
+            <body style="font-family:Arial,sans-serif;text-align:center;padding:50px;">
+                <h1>❌ Verification Failed</h1>
+                <p>Invalid or expired verification link.</p>
+                <p>Please try registering again or contact support.</p>
+                <p><a href="/register.html" style="display:inline-block;margin-top:20px;padding:10px 20px;background:#dc3545;color:#fff;text-decoration:none;border-radius:5px;">Register Again</a></p>
+            </body>
+            </html>
+            """), 400
         # Mark user as verified
-        user = UserModel.find_by_email(email)
+        user = UserModel.find_by_email(verified_email)
         if user:
             UserModel.verify_user(str(user['_id']))
             # Send welcome email
-            send_welcome_email(email, user['name'])
+            send_welcome_email(verified_email, user['name'])
         # Clean up OTPs
         OTPModel.cleanup_expired_otps()
         # Show confirmation HTML
@@ -212,6 +246,35 @@ def verify_email_link(email, otp_code):
         """), 200
     except Exception as e:
         return (f"<h1>Verification error: {str(e)}</h1>"), 500
+
+# Debug route to check OTPs
+@api.route('/debug/otps/<path:email>', methods=['GET'])
+def debug_otps(email):
+    """Debug route to check what OTPs exist for an email."""
+    try:
+        # Try both original and URL decoded email
+        emails_to_check = [email, unquote(email)]
+        
+        all_results = {}
+        for email_variant in emails_to_check:
+            otps = list(mongo.db.otps.find({'email': email_variant}))
+            for otp in otps:
+                otp['_id'] = str(otp['_id'])  # Convert ObjectId to string for JSON
+                otp['expires_at'] = otp['expires_at'].isoformat() if otp.get('expires_at') else None
+                otp['created_at'] = otp['created_at'].isoformat() if otp.get('created_at') else None
+            
+            all_results[email_variant] = {
+                'otps_found': len(otps),
+                'otps': otps
+            }
+        
+        return jsonify({
+            'email_variants_checked': emails_to_check,
+            'results': all_results,
+            'current_time': datetime.utcnow().isoformat()
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @api.route('/resend-otp', methods=['POST'])
 def resend_otp():
@@ -233,6 +296,7 @@ def resend_otp():
         # Generate and send new OTP
         otp_code = OTPModel.create_otp(data['email'])
         verification_link = url_for('api.verify_email_link', email=data['email'], otp_code=otp_code, _external=True)
+        print(f"📧 Generated resend verification link: {verification_link}")
         email_sent = send_otp_email(data['email'], otp_code, user['name'], verification_link)
         
         if not email_sent:

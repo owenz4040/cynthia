@@ -95,7 +95,7 @@ class OTPModel:
             'otp_code': otp_code,
             'otp_type': otp_type,
             'created_at': datetime.utcnow(),
-            'expires_at': datetime.utcnow() + timedelta(minutes=10),  # OTP expires in 10 minutes
+            'expires_at': datetime.utcnow() + timedelta(hours=1),  # OTP expires in 1 hour (extended for testing)
             'is_used': False
         }
         
@@ -108,6 +108,12 @@ class OTPModel:
     @staticmethod
     def verify_otp(email, otp_code, otp_type='email_verification'):
         """Verify OTP code."""
+        print(f"🔍 OTP Verification Debug:")
+        print(f"   Looking for email: {email}")
+        print(f"   Looking for OTP: {otp_code}")
+        print(f"   OTP type: {otp_type}")
+        print(f"   Current time: {datetime.utcnow()}")
+        
         otp_record = mongo.db.otps.find_one({
             'email': email,
             'otp_code': otp_code,
@@ -117,13 +123,19 @@ class OTPModel:
         })
         
         if otp_record:
+            print(f"✅ OTP record found: {otp_record}")
             # Mark OTP as used
             mongo.db.otps.update_one(
                 {'_id': otp_record['_id']},
                 {'$set': {'is_used': True}}
             )
             return True
-        return False
+        else:
+            print("❌ No valid OTP record found")
+            # Let's check what OTPs exist for this email
+            all_otps = list(mongo.db.otps.find({'email': email}))
+            print(f"📋 All OTPs for {email}: {all_otps}")
+            return False
     
     @staticmethod
     def cleanup_expired_otps():

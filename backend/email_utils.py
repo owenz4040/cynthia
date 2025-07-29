@@ -7,6 +7,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from flask import current_app, url_for
 import os
+from urllib.parse import quote
 
 def send_otp_email(to_email, otp_code, user_name="User", verification_link=None):
     """Send OTP verification email."""
