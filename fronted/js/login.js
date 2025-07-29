@@ -253,14 +253,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Forgot password functionality (placeholder)
-    const forgotPasswordLink = document.querySelector('.forgot-password');
-    if (forgotPasswordLink) {
-        forgotPasswordLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            showNotification('Password reset functionality coming soon!', 'info');
-        });
-    }
+    // Forgot password functionality is now implemented
+    // The link in login.html points to forgot-password.html which handles the reset flow
     
     // Show/hide password strength on focus
     const passwordInput = document.getElementById('password');
